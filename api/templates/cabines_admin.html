@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Etiquetas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .card {
+            width: 300px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container my-4">
+        <h1 class="mb-4">Gestão de Etiquetas</h1>
+
+        <div id="etiquetasCards" class="card-container">
+            <!-- Cartões de etiquetas serão inseridos aqui dinamicamente via JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        const apiUrl = "api/cabines";
+
+        // Função para buscar e exibir as etiquetas não impressas
+        function loadEtiquetas() {
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    const cardContainer = document.getElementById("etiquetasCards");
+                    cardContainer.innerHTML = ""; // Limpa os cartões atuais
+
+                    // Filtra e exibe apenas as etiquetas que ainda não foram impressas
+                    data.filter(etiqueta => etiqueta.data_impressao === null).forEach(etiqueta => {
+                        const card = document.createElement("div");
+                        card.className = "card shadow-sm";
+
+                        card.innerHTML = `
+                            <div class="card-body">
+                                <h5 class="card-title">${etiqueta.variedades}</h5>
+                                <p class="card-text">
+                                    <strong>Classificação:</strong> ${etiqueta.classificacao}<br>
+                                    <strong>Peso:</strong> ${etiqueta.peso} Kg<br>
+                                    <strong>Total Etiquetas:</strong> ${etiqueta.total_etiquetas}<br>
+                                    <strong>Modelo:</strong> ${etiqueta.modelo_etiquetas}<br>
+                                    <strong>Cabines:</strong> ${etiqueta.cabines.join(", ")}
+                                </p>
+                                <div class="d-flex justify-content-between">
+                                    <button class="btn btn-warning" onclick="editarCabines(${etiqueta.id})">Editar</button>
+                                    <button class="btn btn-danger" onclick="excluirEtiqueta(${etiqueta.id})">Excluir</button>
+                                    <button class="btn btn-success" onclick="imprimirEtiqueta(${etiqueta.id})">Imprimir</button>
+                                </div>
+                            </div>
+                        `;
+                        cardContainer.appendChild(card);
+                    });
+                })
+                .catch(error => console.error("Erro ao carregar etiquetas:", error));
+        }
+
+        // Função para excluir uma etiqueta
+        function excluirEtiqueta(id) {
+            fetch(`${apiUrl}/${id}`, {
+                method: "DELETE"
+            })
+            .then(() => loadEtiquetas())
+            .catch(error => console.error("Erro ao excluir etiqueta:", error));
+        }
+
+        // Função para editar os códigos das cabines de uma etiqueta
+        function editarCabines(id) {
+            const novasCabines = prompt("Digite os novos códigos das cabines, separados por vírgula:");
+            if (novasCabines) {
+                fetch(`${apiUrl}/${id}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        novas_cabines: novasCabines.split(",").map(cabine => cabine.trim())
+                    })
+                })
+                .then(() => loadEtiquetas())
+                .catch(error => console.error("Erro ao editar cabines:", error));
+            }
+        }
+
+        // Função para imprimir uma etiqueta
+        function imprimirEtiqueta(id) {
+            fetch(`${apiUrl}/${id}/imprimir`, {
+                method: "GET",
+            })
+            .then(() => loadEtiquetas())
+            .catch(error => console.error("Erro ao imprimir etiqueta:", error));
+        }
+
+        // Carrega as etiquetas ao carregar a página
+        window.onload = loadEtiquetas;
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

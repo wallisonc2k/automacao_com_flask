@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Pallets</title>
+    <link rel="stylesheet" href="../static/css/updated_styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">Gerenciador de Pallets</div>
+            <button class="btn btn-sm" id="add-pallet-btn">Novo Pallet</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="card">
+                <div class="card-header">
+                    <div>Filtrar Pallets</div>
+                    <button class="btn btn-sm btn-primary show-filters-btn" onclick="toggleFilters()">Mostrar Filtros</button>
+                </div>
+                <div class="card-body">
+                    <div class="search-bar responsive-filters">
+                        <select id="cliente-filter" class="form-control">
+                            <option value="">Todos os Clientes</option>
+                        </select>
+                        <select id="produto-filter" class="form-control">
+                            <option value="">Todos os Produtos</option>
+                        </select>
+                        <input type="date" id="data-inicial-filter" class="form-control" placeholder="Data Inicial">
+                        <input type="date" id="data-final-filter" class="form-control" placeholder="Data Final">
+                        <button class="btn btn-primary" id="filter-btn">Filtrar</button>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="pallet-list" id="pallet-list">
+                <!-- Pallets serão carregados aqui via JavaScript -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal para visualizar/editar pallet -->
+    <div class="modal-overlay" id="pallet-modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">Detalhes do Pallet</h3>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="tab-container">
+                    <div class="tab-buttons">
+                        <button class="tab-button active" data-tab="info">Informações</button>
+                        <button class="tab-button" data-tab="itens">Itens</button>
+                    </div>
+                    <div class="tab-content">
+                        <div class="tab-panel active" id="tab-info">
+                            <form id="pallet-form">
+                                <input type="hidden" id="pallet-id">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="tipo-caixa">Tipo de Caixa</label>
+                                        <select id="tipo-caixa" class="form-control" required>
+                                            <option value="">Selecione</option>
+                                            <option value="1">Tipo 1</option>
+                                            <option value="2">Tipo 2</option>
+                                            <option value="3">Tipo 3</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="produto">Produto</label>
+                                        <select id="produto" class="form-control" required>
+                                            <option value="">Selecione</option>
+                                            <option value="1">Produto 1</option>
+                                            <option value="2">Produto 2</option>
+                                            <option value="3">Produto 3</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="cliente">Cliente</label>
+                                        <select id="cliente" class="form-control" required>
+                                            <option value="">Selecione</option>
+                                            <option value="1">Cliente 1</option>
+                                            <option value="2">Cliente 2</option>
+                                            <option value="3">Cliente 3</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="tipo-etiqueta">Tipo de Etiqueta</label>
+                                        <select id="tipo-etiqueta" class="form-control" required>
+                                            <option value="">Selecione</option>
+                                            <option value="1">Etiqueta 1</option>
+                                            <option value="2">Etiqueta 2</option>
+                                            <option value="3">Etiqueta 3</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="local-estoque">Local de Estoque</label>
+                                        <select id="local-estoque" class="form-control" required>
+                                            <option value="">Selecione</option>
+                                            <option value="1">Local 1</option>
+                                            <option value="2">Local 2</option>
+                                            <option value="3">Local 3</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="processo-interno">Processo Interno</label>
+                                        <input type="text" id="processo-interno" class="form-control" required>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="tab-panel" id="tab-itens">
+                            <button class="btn btn-primary add-item-btn" id="add-item-btn">Adicionar Item</button>
+                            <div id="item-container">
+                                <!-- Items serão adicionados aqui via JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success" id="imprimir-pallet-btn">Imprimir</button>
+                <button class="btn btn-danger" id="delete-pallet-btn">Excluir</button>
+                <button class="btn btn-primary" id="save-pallet-btn">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para adicionar/editar item -->
+    <div class="modal-overlay" id="item-modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="item-modal-title">Adicionar Item</h3>
+                <button class="modal-close" id="item-modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="item-form">
+                    <input type="hidden" id="item-id">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="esteira">Esteira</label>
+                            <select id="esteira" class="form-control" required>
+                                <option value="">Selecione</option>
+                                <option value="1">Esteira 1</option>
+                                <option value="2">Esteira 2</option>
+                                <option value="3">Esteira 3</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="latada">Latada</label>
+                            <input type="number" id="latada" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="q-caixas">Quantidade de Caixas</label>
+                            <input type="number" id="q-caixas" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cor">Cor</label>
+                            <input type="text" id="cor" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="calibre">Calibre</label>
+                            <input type="number" id="calibre" class="form-control" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="brix">Brix</label>
+                            <input type="number" id="brix" class="form-control" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="observacoes">Observações</label>
+                        <textarea id="observacoes" class="form-control" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="save-item-btn">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toast-container">
+        <!-- Toasts will be added here dynamically -->
+    </div>
+
+    <!-- Loading Spinner -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+    </div>
+
+    <script>
+        // Base URL da API
+        const API_BASE_URL = 'http://{{ api_url_ip }}:5000/api'
+
+        // Estado da aplicação
+        let pallets = [];
+        let currentPallet = null;
+        let currentItem = null;
+        let editMode = false;
+
+        // Elementos DOM
+        const palletList = document.getElementById('pallet-list');
+        const addPalletBtn = document.getElementById('add-pallet-btn');
+        const filterBtn = document.getElementById('filter-btn');
+        const palletModalOverlay = document.getElementById('pallet-modal-overlay');
+        const itemModalOverlay = document.getElementById('item-modal-overlay');
+        const modalClose = document.getElementById('modal-close');
+        const itemModalClose = document.getElementById('item-modal-close');
+        const savePalletBtn = document.getElementById('save-pallet-btn');
+        const saveItemBtn = document.getElementById('save-item-btn');
+        const deletePalletBtn = document.getElementById('delete-pallet-btn');
+        const addItemBtn = document.getElementById('add-item-btn');
+        const itemContainer = document.getElementById('item-container');
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const loading = document.getElementById('loading');
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', init);
+        addPalletBtn.addEventListener('click', () => openPalletModal());
+        filterBtn.addEventListener('click', filterPallets);
+        modalClose.addEventListener('click', closePalletModal);
+        itemModalClose.addEventListener('click', closeItemModal);
+        savePalletBtn.addEventListener('click', savePallet);
+        saveItemBtn.addEventListener('click', saveItem);
+        deletePalletBtn.addEventListener('click', deletePallet);
+        addItemBtn.addEventListener('click', () => openItemModal());
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons and panels
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+                
+                // Add active class to clicked button and corresponding panel
+                button.classList.add('active');
+                document.getElementById(`tab-${button.dataset.tab}`).classList.add('active');
+            });
+        });
+
+        // Funções de inicialização
+        function init() {
+            loadPallets();
+        }
+
+        // API Functions
+        async function loadPallets(filters = {}) {
+            showLoading();
+            try {
+                let url = `${API_BASE_URL}/pallets`;
+                
+                // Add query params for filters
+                const queryParams = new URLSearchParams();
+                if (filters.cliente) queryParams.append('cliente', filters.cliente);
+                if (filters.produto) queryParams.append('produto', filters.produto);
+                if (filters.data_inicial) queryParams.append('data_inicial', filters.data_inicial);
+                if (filters.data_final) queryParams.append('data_final', filters.data_final);
+                
+                const queryString = queryParams.toString();
+                if (queryString) {
+                    url += `?${queryString}`;
+                }
+                
+                // In a real application, you would fetch the data from the API
+                // For this example, we'll use mock data
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Failed to load pallets');
+                const data = await response.json();
+                pallets = data.pallets;
+                
+                // Mock data for demonstration
+                // pallets = [
+                // {
+                //         id: 1,
+                //         cabecalho: {
+                //             tipo_de_caixa: 1,
+                //             tex_tipoCaixa: "Caixa Tipo A",
+                //             des_produto: 1,
+                //             tex_descProduto: "Uva Thompson",
+                //             cliente: 1,
+                //             tex_cliente: "Cliente ABC",
+                //             tipo_de_etiqueta: 1,
+                //             tex_tipoEtiqueta: "Etiqueta Padrão",
+                //             local_de_estoque: 1,
+                //             tex_localEstoque: "Armazém Principal",
+                //             processo_interno: "PRO-2023-001"
+                //         },
+                //         itens: [
+                //             {
+                //                 id: 1,
+                //                 esteira: 1,
+                //                 tex_esteira: "Esteira Principal",
+                //                 latada: 123,
+                //                 q_caixas: 50,
+                //                 cor: "Verde",
+                //                 calibre: 18.5,
+                //                 brix: 16.2,
+                //                 observacoes: "Qualidade excelente"
+                //             },
+                //             {
+                //                 id: 2,
+                //                 esteira: 2,
+                //                 tex_esteira: "Esteira Secundária",
+                //                 latada: 124,
+                //                 q_caixas: 30,
+                //                 cor: "Verde Claro",
+                //                 calibre: 17.8,
+                //                 brix: 15.9,
+                //                 observacoes: ""
+                //             }
+                //         ],
+                //         data_criacao: "2025-05-15T10:30:00"
+                //     },
+                //     {
+                //         id: 2,
+                //         cabecalho: {
+                //             tipo_de_caixa: 2,
+                //             tex_tipoCaixa: "Caixa Tipo B",
+                //             des_produto: 2,
+                //             tex_descProduto: "Uva Crimson",
+                //             cliente: 2,
+                //             tex_cliente: "Cliente XYZ",
+                //             tipo_de_etiqueta: 2,
+                //             tex_tipoEtiqueta: "Etiqueta Premium",
+                //             local_de_estoque: 2,
+                //             tex_localEstoque: "Armazém Secundário",
+                //             processo_interno: "PRO-2023-002"
+                //         },
+                //         itens: [
+                //             {
+                //                 id: 3,
+                //                 esteira: 1,
+                //                 tex_esteira: "Esteira Principal",
+                //                 latada: 145,
+                //                 q_caixas: 40,
+                //                 cor: "Vermelho",
+                //                 calibre: 19.2,
+                //                 brix: 17.5,
+                //                 observacoes: "Coloração perfeita"
+                //             }
+                //         ],
+                //         data_criacao: "2025-05-16T14:15:00"
+                //     }
+                // ];
+                
+                renderPallets();
+            } catch (error) {
+                showToast('Erro ao carregar pallets: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function getPalletById(id) {
+            showLoading();
+            try {
+                // In a real application, fetch from API
+                const response = await fetch(`${API_BASE_URL}/pallets/${id}`);
+                if (!response.ok) throw new Error('Failed to load pallet details');
+                return await response.json();
+                
+                // For demo, return from mock data
+                // const pallet = pallets.find(p => p.id === id);
+                // if (!pallet) throw new Error('Pallet não encontrado');
+                // return pallet;
+            } catch (error) {
+                showToast('Erro ao carregar detalhes do pallet: ' + error.message, 'error');
+                return null;
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function createPallet(palletData) {
+            showLoading();
+            try {
+                // In a real application, send to API
+                const response = await fetch(`${API_BASE_URL}/pallets`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(palletData)
+                });
+                if (!response.ok) throw new Error('Failed to create pallet');
+                return await response.json();
+                
+                // For demo, just add to mock data
+                // const newId = pallets.length > 0 ? Math.max(...pallets.map(p => p.id)) + 1 : 1;
+                // const newPallet = {
+                //     id: newId,
+                //     ...palletData,
+                //     data_criacao: new Date().toISOString()
+                // };
+                // pallets.push(newPallet);
+                // return newPallet;
+            } catch (error) {
+                showToast('Erro ao criar pallet: ' + error.message, 'error');
+                throw error;
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function updatePallet(id, palletData) {
+            showLoading();
+            try {
+                // In a real application, send to API
+                const response = await fetch(`${API_BASE_URL}/pallets/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(palletData)
+                });
+                if (!response.ok) throw new Error('Failed to update pallet');
+                return await response.json();
+                
+                // For demo, update in mock data
+                // const index = pallets.findIndex(p => p.id === id);
+                // if (index === -1) throw new Error('Pallet não encontrado');
+                // pallets[index] = {
+                //     ...pallets[index],
+                //     ...palletData
+                // };
+                // return pallets[index];
+            } catch (error) {
+                showToast('Erro ao atualizar pallet: ' + error.message, 'error');
+                throw error;
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function deletePalletById(id) {
+            showLoading();
+            try {
+                // In a real application, send to API
+                const response = await fetch(`${API_BASE_URL}/pallets/${id}`, {
+                    method: 'DELETE'
+                });
+                if (!response.ok) throw new Error('Failed to delete pallet');
+                
+                // For demo, remove from mock data
+                // const index = pallets.findIndex(p => p.id === id);
+                // if (index === -1) throw new Error('Pallet não encontrado');
+                // pallets.splice(index, 1);
+                // return true;
+            } catch (error) {
+                showToast('Erro ao excluir pallet: ' + error.message, 'error');
+                throw error;
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function addItemToPallet(palletId, itemData) {
+            showLoading();
+            try {
+                // In a real application, send to API
+                const response = await fetch(`${API_BASE_URL}/pallets/${palletId}/itens`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(itemData)
+                });
+                if (!response.ok) throw new Error('Failed to add item');
+                return await response.json();
+                
+                // For demo, add to mock data
+                // const pallet = pallets.find(p => p.id === palletId);
+                // if (!pallet) throw new Error('Pallet não encontrado');
+                
+                // const newItemId = pallet.itens.length > 0 
+                //     ? Math.max(...pallet.itens.map(i => i.id)) + 1 
+                //     : 1;
+                
+                // const newItem = {
+                //     id: newItemId,
+                //     ...itemData
+                // };
+                
+                // pallet.itens.push(newItem);
+                // return newItem;
+            } catch (error) {
+                showToast('Erro ao adicionar item: ' + error.message, 'error');
+                throw error;
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function deleteItem(itemId) {
+            showLoading();
+            try {
+                // In a real application, send to API
+                const response = await fetch(`${API_BASE_URL}/pallets/itens/${itemId}`, {
+                    method: 'DELETE'
+                });
+                if (!response.ok) throw new Error('Failed to delete item');
+                
+                // For demo, remove from mock data
+                // for (const pallet of pallets) {
+                //     const index = pallet.itens.findIndex(i => i.id === itemId);
+                //     if (index !== -1) {
+                //         pallet.itens.splice(index, 1);
+                //         return true;
+                //     }
+                // }
+                // throw new Error('Item não encontrado');
+            } catch (error) {
+                showToast('Erro ao excluir item: ' + error.message, 'error');
+                throw error;
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // UI Functions
+        function renderPallets() {
+            palletList.innerHTML = '';
+            
+            if (pallets.length === 0) {
+                palletList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📦</div>
+                        <h3>Nenhum pallet encontrado</h3>
+                        <p>Clique em "Novo Pallet" para adicionar um pallet.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            pallets.forEach(pallet => {
+                const totalCaixas = pallet.itens.reduce((sum, item) => sum + item.q_caixas, 0);
+                const card = document.createElement('div');
+                card.className = 'pallet-card';
+                card.innerHTML = `
+                    <div class="pallet-header">
+                        <h3>Pallet #${pallet.id}</h3>
+                    </div>
+                    <div class="pallet-body">
+                        <div class="pallet-info"><strong>Produto:</strong> ${pallet.cabecalho.tex_descProduto}</div>
+                        <div class="pallet-info"><strong>Cliente:</strong> ${pallet.cabecalho.tex_cliente}</div>
+                        <div class="pallet-info"><strong>Caixas:</strong> ${totalCaixas}</div>
+                        <div class="pallet-info"><strong>Processo:</strong> ${pallet.cabecalho.processo_interno}</div>
+                        <div class="pallet-info"><strong>Data:</strong> ${new Date(pallet.data_criacao).toLocaleDateString()}</div>
+                    </div>
+                    <div class="pallet-footer">
+                        <span class="badge badge-success">${pallet.itens.length} itens</span>
+                        <button class="btn btn-sm btn-primary view-btn">Ver Detalhes</button>
+                    </div>
+                `;
+                
+                card.querySelector('.view-btn').addEventListener('click', () => openPalletModal(pallet.id));
+                palletList.appendChild(card);
+            });
+        }
+
+        function renderItems() {
+            if (!currentPallet) return;
+            
+            itemContainer.innerHTML = '';
+            
+            if (currentPallet.itens.length === 0) {
+                itemContainer.innerHTML = `
+                    <div class="empty-state">
+                        <p>Nenhum item adicionado</p>
+                        <p>Clique em "Adicionar Item" para incluir itens ao pallet.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            currentPallet.itens.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'item-card';
+                itemElement.innerHTML = `
+                    <button class="item-delete" data-id="${item.id}">&times;</button>
+                    <div class="item-row">
+                        <strong>Esteira:</strong> ${item.tex_esteira}
+                        <strong>Latada:</strong> ${item.latada}
+                    </div>
+                    <div class="item-row">
+                        <strong>Caixas:</strong> ${item.q_caixas}
+                        <strong>Cor:</strong> ${item.cor}
+                    </div>
+                    <div class="item-row">
+                        <strong>Calibre:</strong> ${item.calibre}
+                        <strong>Brix:</strong> ${item.brix}
+                    </div>
+                    ${item.observacoes ? `<div class="item-row"><strong>Obs:</strong> ${item.observacoes}</div>` : ''}
+                `;
+                
+                // Add event listeners
+                itemElement.querySelector('.item-delete').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const itemId = parseInt(e.target.dataset.id);
+                    confirmDeleteItem(itemId);
+                });
+                
+                itemElement.addEventListener('click', () => {
+                    openItemModal(item.id);
+                });
+                
+                itemContainer.appendChild(itemElement);
+            });
+        }
+
+        function fillPalletForm(pallet) {
+            document.getElementById('pallet-id').value = pallet.id || '';
+            document.getElementById('tipo-caixa').value = pallet.cabecalho.tipo_de_caixa || '';
+            document.getElementById('produto').value = pallet.cabecalho.des_produto || '';
+            document.getElementById('cliente').value = pallet.cabecalho.cliente || '';
+            document.getElementById('tipo-etiqueta').value = pallet.cabecalho.tipo_de_etiqueta || '';
+            document.getElementById('local-estoque').value = pallet.cabecalho.local_de_estoque || '';
+            document.getElementById('processo-interno').value = pallet.cabecalho.processo_interno || '';
+        }
+
+        function fillItemForm(item) {
+            document.getElementById('item-id').value = item.id || '';
+            document.getElementById('esteira').value = item.esteira || '';
+            document.getElementById('latada').value = item.latada || '';
+            document.getElementById('q-caixas').value = item.q_caixas || '';
+            document.getElementById('cor').value = item.cor || '';
+            document.getElementById('calibre').value = item.calibre || '';
+            document.getElementById('brix').value = item.brix || '';
+            document.getElementById('observacoes').value = item.observacoes || '';
+        }
+
+        function getPalletFormData() {
+            return {
+                cabecalho: {
+                    tipo_de_caixa: parseInt(document.getElementById('tipo-caixa').value),
+                    tex_tipoCaixa: document.getElementById('tipo-caixa').options[document.getElementById('tipo-caixa').selectedIndex].text,
+                    des_produto: parseInt(document.getElementById('produto').value),
+                    tex_descProduto: document.getElementById('produto').options[document.getElementById('produto').selectedIndex].text,
+                    cliente: parseInt(document.getElementById('cliente').value),
+                    tex_cliente: document.getElementById('cliente').options[document.getElementById('cliente').selectedIndex].text,
+                    tipo_de_etiqueta: parseInt(document.getElementById('tipo-etiqueta').value),
+                    tex_tipoEtiqueta: document.getElementById('tipo-etiqueta').options[document.getElementById('tipo-etiqueta').selectedIndex].text,
+                    local_de_estoque: parseInt(document.getElementById('local-estoque').value),
+                    tex_localEstoque: document.getElementById('local-estoque').options[document.getElementById('local-estoque').selectedIndex].text,
+                    processo_interno: document.getElementById('processo-interno').value
+                },
+                itens: currentPallet ? [...currentPallet.itens] : []
+            };
+        }
+
+        function getItemFormData() {
+            const esteiraElement = document.getElementById('esteira');
+            const latadaElement = document.getElementById('latada');
+            const calibre = parseInt(document.getElementById('calibre').value);
+            const brix = parseInt(document.getElementById('brix').value);
+
+            return {
+                esteira: parseInt(esteiraElement.value) || 0,
+                tex_esteira: esteiraElement.options[esteiraElement.selectedIndex].text,
+                latada: latadaElement.value.toString(), // 👈 garantir string
+                q_caixas: parseInt(document.getElementById('q-caixas').value) || 0,
+                cor: document.getElementById('cor').value || "",
+                calibre: isNaN(calibre) ? 0 : calibre, // 👈 evitar NaN
+                brix: isNaN(brix) ? 0 : brix,           // 👈 evitar NaN
+                observacoes: document.getElementById('observacoes').value || ""
+            };
+        }
+
+
+        // Modal Functions
+        async function openPalletModal(palletId = null) {
+            editMode = !!palletId;
+            
+            // Reset form
+            document.getElementById('pallet-form').reset();
+            
+            // Reset tabs
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+            document.querySelector('.tab-button[data-tab="info"]').classList.add('active');
+            document.getElementById('tab-info').classList.add('active');
+            
+            if (editMode) {
+                // Load pallet details
+                currentPallet = await getPalletById(palletId);
+                if (!currentPallet) return;
+                
+                document.getElementById('modal-title').textContent = `Editar Pallet #${palletId}`;
+                fillPalletForm(currentPallet);
+                renderItems();
+                deletePalletBtn.style.display = 'block';
+            } else {
+                // New pallet
+                currentPallet = {
+                    cabecalho: {},
+                    itens: []
+                };
+                document.getElementById('modal-title').textContent = 'Novo Pallet';
+                itemContainer.innerHTML = '';
+                deletePalletBtn.style.display = 'none';
+            }
+            
+            // Show modal
+            palletModalOverlay.classList.add('active');
+        }
+
+        function closePalletModal() {
+            palletModalOverlay.classList.remove('active');
+            currentPallet = null;
+        }
+
+        function openItemModal(itemId = null) {
+            if (!currentPallet) return;
+            
+            // Reset form
+            document.getElementById('item-form').reset();
+            
+            if (itemId) {
+                // Edit existing item
+                currentItem = currentPallet.itens.find(item => item.id === itemId);
+                if (!currentItem) return;
+                
+                document.getElementById('item-modal-title').textContent = 'Editar Item';
+                fillItemForm(currentItem);
+            } else {
+                // New item
+                currentItem = null;
+                document.getElementById('item-modal-title').textContent = 'Adicionar Item';
+            }
+            
+            // Show modal
+            itemModalOverlay.classList.add('active');
+        }
+
+        function closeItemModal() {
+            itemModalOverlay.classList.remove('active');
+            currentItem = null;
+        }
+
+        // Action Functions
+        async function savePallet() {
+            try {
+                if (!validatePalletForm()) return;
+                
+                const palletData = getPalletFormData();
+                
+                if (editMode) {
+                    // Update existing pallet
+                    await updatePallet(currentPallet.id, palletData);
+                    showToast('Pallet atualizado com sucesso', 'success');
+                } else {
+                    // Create new pallet
+                    await createPallet(palletData);
+                    showToast('Pallet criado com sucesso', 'success');
+                }
+                
+                closePalletModal();
+                loadPallets();
+            } catch (error) {
+                showToast('Erro ao salvar pallet: ' + error.message, 'error');
+            }
+        }
+
+        async function saveItem() {
+            try {
+                if (!validateItemForm()) return;
+                
+                const itemData = getItemFormData();
+                
+                if (currentItem) {
+                    // Update existing item
+                    const index = currentPallet.itens.findIndex(i => i.id === currentItem.id);
+                    if (index !== -1) {
+                        currentPallet.itens[index] = {
+                            ...currentPallet.itens[index],
+                            ...itemData
+                        };
+                        showToast('Item atualizado com sucesso', 'success');
+                    }
+                } else {
+                    // Add new item
+                    await addItemToPallet(currentPallet.id, itemData);
+                    showToast('Item adicionado com sucesso', 'success');
+                }
+                
+                closeItemModal();
+                renderItems();
+            } catch (error) {
+                showToast('Erro ao salvar item: ' + error.message, 'error');
+            }
+        }
+
+        async function deletePallet() {
+            if (!currentPallet) return;
+            
+            if (confirm(`Tem certeza que deseja excluir o Pallet #${currentPallet.id}?`)) {
+                try {
+                    await deletePalletById(currentPallet.id);
+                    showToast('Pallet excluído com sucesso', 'success');
+                    closePalletModal();
+                    loadPallets();
+                } catch (error) {
+                    showToast('Erro ao excluir pallet: ' + error.message, 'error');
+                }
+            }
+        }
+
+        async function confirmDeleteItem(itemId) {
+            if (confirm('Tem certeza que deseja excluir este item?')) {
+                try {
+                    await deleteItem(itemId);
+                    showToast('Item excluído com sucesso', 'success');
+                    
+                    // Update current pallet item list
+                    if (currentPallet) {
+                        currentPallet.itens = currentPallet.itens.filter(i => i.id !== itemId);
+                        renderItems();
+                    }
+                } catch (error) {
+                    showToast('Erro ao excluir item: ' + error.message, 'error');
+                }
+            }
+        }
+
+        function filterPallets() {
+            const cliente = document.getElementById('cliente-filter').value;
+            const produto = document.getElementById('produto-filter').value;
+            const dataInicial = document.getElementById('data-inicial-filter').value;
+            const dataFinal = document.getElementById('data-final-filter').value;
+            
+            loadPallets({
+                cliente,
+                produto,
+                data_inicial: dataInicial,
+                data_final: dataFinal
+            });
+        }
+
+        // Validation Functions
+        function validatePalletForm() {
+            const form = document.getElementById('pallet-form');
+            return form.checkValidity();
+        }
+
+        function validateItemForm() {
+            const form = document.getElementById('item-form');
+            return form.checkValidity();
+        }
+
+        // Helper Functions
+        function showToast(message, type = 'success') {
+            const toastContainer = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `
+                <span>${message}</span>
+                <button class="toast-close">&times;</button>
+            `;
+            
+            toast.querySelector('.toast-close').addEventListener('click', () => {
+                toast.remove();
+            });
+            
+            toastContainer.appendChild(toast);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                toast.remove();
+            }, 5000);
+        }
+
+        function showLoading() {
+            loading.classList.add('active');
+        }
+
+        function hideLoading() {
+            loading.classList.remove('active');
+        }
+        function toggleFilters() {
+            const filters = document.querySelector('.responsive-filters');
+            filters.classList.toggle('show');
+        }
+    </script>
+</body>
+</html>

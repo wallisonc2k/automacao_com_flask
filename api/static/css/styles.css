@@ -1,0 +1,134 @@
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #dc3545;
+    --background-color: #202d42; //#f0f0f0; // #143da6;
+    --card-width: 300px;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding-left: 20px;
+    background-color: var(--background-color);
+}
+
+.container {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 10px;
+}
+
+.card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-right: 20px;
+    padding: 20px;
+    min-width: var(--card-width);
+    scroll-snap-align: start;
+}
+
+.card input, .card select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.button-group {
+    display: flex;
+    align-items: center;
+}
+
+.card button {
+    padding: 10px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    flex: 1;
+    margin: 5px;
+    width: 30px;
+}
+
+.card button.delete {
+    background-color: var(--secondary-color);
+}
+
+.card button:hover {
+    opacity: 0.9;
+}
+
+.button-container {
+    text-align: center;
+    margin-bottom: 5px; /* Espaço entre os botões e o conteúdo abaixo */
+}
+
+/* .add-card {
+    margin: 0 5px; // Espaçamento entre os botões
+} */
+
+.add-card {
+    //display: flex-inline;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    cursor: pointer;
+    margin: 20px 10px 10px 10px;
+    // position: fixed;
+    // top: 20px;
+    // right: 20px;
+}
+
+.title {
+    display: none;
+    text-align: center;
+    margin: 20px 0;
+    font-size: 24px;
+}
+
+.cabines-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 0;
+    margin-bottom: 10px;
+    justify-content: center; /* Adiciona esta linha para centralizar os itens */
+}
+
+.cabine-button {
+    padding: 10px 20px;
+    background-color: #ddd;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.cabine-button.selected {
+    background-color: var(--primary-color);
+    color: white;
+}
+.card-indicator {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    background-color: #f0f0f0;
+    padding: 3px 7px;
+    border-radius: 3px;
+}
+
+@media (max-width: 768px) {
+    .card {
+        min-width: 100%;
+    }
+}
