@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+
+{% block title %}Configurações{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Configurações do Sistema</h4>
+                </div>
+                <div class="card-body">
+                    <form id="configForm" method="post">
+                        <!-- Configurações Básicas -->
+                        <div class="mb-4">
+                            <h5>Configurações Básicas</h5>
+                            <div class="mb-3">
+                                <label for="url_site" class="form-label">URL do Site</label>
+                                <input type="text" class="form-control" id="url_site" name="url_site" value="{{ configuracoes.url_site }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="usuario" class="form-label">Usuário</label>
+                                <input type="text" class="form-control" id="usuario" name="usuario" value="{{ configuracoes.usuario }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="senha" class="form-label">Senha</label>
+                                <input type="password" class="form-control" id="senha" name="senha" value="{{ configuracoes.senha }}">
+                            </div>
+                        </div>
+
+                        <!-- Configurações de Selects -->
+                        <div class="mb-4">
+                            <h5>Configurações de Selects</h5>
+                            
+                            <div class="accordion" id="accordionSelects">
+                                <!-- Tipo de Caixa -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTipoCaixa" aria-expanded="true" aria-controls="collapseTipoCaixa">
+                                            Tipo de Caixa
+                                        </button>
+                                    </h2>
+                                    <div id="collapseTipoCaixa" class="accordion-collapse collapse show" data-bs-parent="#accordionSelects">
+                                        <div class="accordion-body">
+                                            <div class="mb-3">
+                                                <label for="tipo_caixa_json" class="form-label">Dados (formato JSON)</label>
+                                                <textarea class="form-control" id="tipo_caixa_json" name="tipo_caixa_json" rows="5" placeholder='{"value1": "Texto 1", "value2": "Texto 2", ...}'>{{ configuracoes.tipo_caixa_json }}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Produto -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseProduto" aria-expanded="false" aria-controls="collapseProduto">
+                                            Produto
+                                        </button>
+                                    </h2>
+                                    <div id="collapseProduto" class="accordion-collapse collapse" data-bs-parent="#accordionSelects">
+                                        <div class="accordion-body">
+                                            <div class="mb-3">
+                                                <label for="produto_json" class="form-label">Dados (formato JSON)</label>
+                                                <textarea class="form-control" id="produto_json" name="produto_json" rows="5" placeholder='{"value1": "Texto 1", "value2": "Texto 2", ...}'>{{ configuracoes.produto_json }}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Cliente -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCliente" aria-expanded="false" aria-controls="collapseCliente">
+                                            Cliente
+                                        </button>
+                                    </h2>
+                                    <div id="collapseCliente" class="accordion-collapse collapse" data-bs-parent="#accordionSelects">
+                                        <div class="accordion-body">
+                                            <div class="mb-3">
+                                                <label for="cliente_json" class="form-label">Dados (formato JSON)</label>
+                                                <textarea class="form-control" id="cliente_json" name="cliente_json" rows="5" placeholder='{"value1": "Texto 1", "value2": "Texto 2", ...}'>{{ configuracoes.cliente_json }}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Tipo de Etiqueta -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTipoEtiqueta" aria-expanded="false" aria-controls="collapseTipoEtiqueta">
+                                            Tipo de Etiqueta
+                                        </button>
+                                    </h2>
+                                    <div id="collapseTipoEtiqueta" class="accordion-collapse collapse" data-bs-parent="#accordionSelects">
+                                        <div class="accordion-body">
+                                            <div class="mb-3">
+                                                <label for="tipo_etiqueta_json" class="form-label">Dados (formato JSON)</label>
+                                                <textarea class="form-control" id="tipo_etiqueta_json" name="tipo_etiqueta_json" rows="5" placeholder='{"value1": "Texto 1", "value2": "Texto 2", ...}'>{{ configuracoes.tipo_etiqueta_json }}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Local de Estoque -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseLocalEstoque" aria-expanded="false" aria-controls="collapseLocalEstoque">
+                                            Local de Estoque
+                                        </button>
+                                    </h2>
+                                    <div id="collapseLocalEstoque" class="accordion-collapse collapse" data-bs-parent="#accordionSelects">
+                                        <div class="accordion-body">
+                                            <div class="mb-3">
+                                                <label for="local_estoque_json" class="form-label">Dados (formato JSON)</label>
+                                                <textarea class="form-control" id="local_estoque_json" name="local_estoque_json" rows="5" placeholder='{"value1": "Texto 1", "value2": "Texto 2", ...}'>{{ configuracoes.local_estoque_json }}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Esteira -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEsteira" aria-expanded="false" aria-controls="collapseEsteira">
+                                            Esteira
+                                        </button>
+                                    </h2>
+                                    <div id="collapseEsteira" class="accordion-collapse collapse" data-bs-parent="#accordionSelects">
+                                        <div class="accordion-body">
+                                            <div class="mb-3">
+                                                <label for="esteira_json" class="form-label">Dados (formato JSON)</label>
+                                                <textarea class="form-control" id="esteira_json" name="esteira_json" rows="5" placeholder='{"value1": "Texto 1", "value2": "Texto 2", ...}'>{{ configuracoes.esteira_json }}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Latada -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseLatada" aria-expanded="false" aria-controls="collapseLatada">
+                                            Latada
+                                        </button>
+                                    </h2>
+                                    <div id="collapseLatada" class="accordion-collapse collapse" data-bs-parent="#accordionSelects">
+                                        <div class="accordion-body">
+                                            <div class="mb-3">
+                                                <label for="latada_json" class="form-label">Dados (formato JSON)</label>
+                                                <textarea class="form-control" id="latada_json" name="latada_json" rows="5" placeholder='{"value1": "Texto 1", "value2": "Texto 2", ...}'>{{ configuracoes.latada_json }}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-primary" id="btnSalvar">Salvar Configurações</button>
+                            <a href="{{ url_for('home') }}" class="btn btn-secondary">Voltar</a>
+                            <button type="button" class="btn btn-info" id="btnTestarJSON">Validar JSON</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Alerta -->
+<div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="alertModalLabel">Aviso</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body" id="alertModalBody">
+                <!-- Conteúdo do alerta será inserido aqui -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Função para validar JSON
+function isValidJSON(str) {
+    try {
+        JSON.parse(str);
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
+
+// Função para mostrar alerta
+function showAlert(message, isError = false) {
+    const modalBody = document.getElementById('alertModalBody');
+    modalBody.innerHTML = message;
+    
+    const modalEl = document.getElementById('alertModal');
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+}
+
+// Testa todos os campos JSON
+function validateAllJSON() {
+    const jsonFields = [
+        'tipo_caixa_json', 'produto_json', 'cliente_json', 'tipo_etiqueta_json',
+        'local_estoque_json', 'esteira_json', 'latada_json'
+    ];
+    
+    let hasError = false;
+    let errorMessage = '';
+    
+    jsonFields.forEach(field => {
+        const value = document.getElementById(field).value.trim();
+        if (value) {
+            if (!isValidJSON(value)) {
+                hasError = true;
+                errorMessage += `O campo ${field.replace('_json', '').replace('_', ' ')} não contém um JSON válido.<br>`;
+            }
+        }
+    });
+    
+    if (hasError) {
+        showAlert(errorMessage, true);
+    } else {
+        showAlert("Todos os campos JSON estão válidos!");
+    }
+}
+
+// Salvar configurações via AJAX
+function saveConfigs(event) {
+    event.preventDefault();
+    
+    // Validar campos JSON
+    const jsonFields = [
+        'tipo_caixa_json', 'produto_json', 'cliente_json', 'tipo_etiqueta_json',
+        'local_estoque_json', 'esteira_json', 'latada_json'
+    ];
+    
+    let hasError = false;
+    let errorMessage = '';
+    
+    jsonFields.forEach(field => {
+        const value = document.getElementById(field).value.trim();
+        if (value && !isValidJSON(value)) {
+            hasError = true;
+            errorMessage += `O campo ${field.replace('_json', '').replace('_', ' ')} não contém um JSON válido.<br>`;
+        }
+    });
+    
+    if (hasError) {
+        showAlert(errorMessage, true);
+        return;
+    }
+    
+    // Coletar dados do formulário
+    const formData = new FormData(document.getElementById('configForm'));
+    
+    // Enviar via AJAX
+    fetch('/configuracoes/salvar', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.sucesso) {
+            showAlert(data.mensagem);
+        } else {
+            showAlert(data.erros.join('<br>'), true);
+        }
+    })
+    .catch(error => {
+        showAlert("Erro ao salvar as configurações: " + error, true);
+    });
+}
+
+// Inicializar página
+document.addEventListener('DOMContentLoaded', function() {
+    // Configurar eventos dos botões
+    document.getElementById('btnSalvar').addEventListener('click', saveConfigs);
+    document.getElementById('btnTestarJSON').addEventListener('click', validateAllJSON);
+});
+</script>
+{% endblock %}

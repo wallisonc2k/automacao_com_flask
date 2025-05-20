@@ -65,18 +65,12 @@
                                         <label for="tipo-caixa">Tipo de Caixa</label>
                                         <select id="tipo-caixa" class="form-control" required>
                                             <option value="">Selecione</option>
-                                            <option value="1">Tipo 1</option>
-                                            <option value="2">Tipo 2</option>
-                                            <option value="3">Tipo 3</option>
                                         </select>
                                     </div>
                                     <div class="form-group">
                                         <label for="produto">Produto</label>
                                         <select id="produto" class="form-control" required>
                                             <option value="">Selecione</option>
-                                            <option value="1">Produto 1</option>
-                                            <option value="2">Produto 2</option>
-                                            <option value="3">Produto 3</option>
                                         </select>
                                     </div>
                                 </div>
@@ -85,18 +79,12 @@
                                         <label for="cliente">Cliente</label>
                                         <select id="cliente" class="form-control" required>
                                             <option value="">Selecione</option>
-                                            <option value="1">Cliente 1</option>
-                                            <option value="2">Cliente 2</option>
-                                            <option value="3">Cliente 3</option>
                                         </select>
                                     </div>
                                     <div class="form-group">
                                         <label for="tipo-etiqueta">Tipo de Etiqueta</label>
                                         <select id="tipo-etiqueta" class="form-control" required>
                                             <option value="">Selecione</option>
-                                            <option value="1">Etiqueta 1</option>
-                                            <option value="2">Etiqueta 2</option>
-                                            <option value="3">Etiqueta 3</option>
                                         </select>
                                     </div>
                                 </div>
@@ -105,9 +93,6 @@
                                         <label for="local-estoque">Local de Estoque</label>
                                         <select id="local-estoque" class="form-control" required>
                                             <option value="">Selecione</option>
-                                            <option value="1">Local 1</option>
-                                            <option value="2">Local 2</option>
-                                            <option value="3">Local 3</option>
                                         </select>
                                     </div>
                                     <div class="form-group">
@@ -149,14 +134,11 @@
                             <label for="esteira">Esteira</label>
                             <select id="esteira" class="form-control" required>
                                 <option value="">Selecione</option>
-                                <option value="1">Esteira 1</option>
-                                <option value="2">Esteira 2</option>
-                                <option value="3">Esteira 3</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="latada">Latada</label>
-                            <input type="number" id="latada" class="form-control" required>
+                            <input type="text" id="latada" class="form-control" required>
                         </div>
                     </div>
                     <div class="form-row">
@@ -204,6 +186,10 @@
     <script>
         // Base URL da API
         const API_BASE_URL = 'http://{{ api_url_ip }}:5000/api'
+        const CAMPOS_SELECT = [
+            'tipo_caixa', 'produto', 'cliente', 'tipo_etiqueta',
+            'local_estoque', 'esteira'
+        ];
 
         // Estado da aplicação
         let pallets = [];
@@ -253,6 +239,7 @@
         // Funções de inicialização
         function init() {
             loadPallets();
+            preencherSelects();
         }
 
         // API Functions
@@ -360,6 +347,37 @@
                 showToast('Erro ao carregar pallets: ' + error.message, 'error');
             } finally {
                 hideLoading();
+            }
+        }
+
+        async function preencherSelects() {
+            for (const campo of CAMPOS_SELECT) {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/configuracoes/${campo}`);
+                    if (!response.ok) {
+                        console.warn(`Erro ao buscar ${campo}: ${response.statusText}`);
+                        continue;
+                    }
+
+                    const data = await response.json();
+                    const options = data.valor_json;
+                    const selectEl = document.getElementById(campo.replace(/_/g, '-'));
+
+                    if (selectEl && options) {
+                        // Limpa as opções atuais
+                        selectEl.innerHTML = '<option value="">Selecione</option>';
+
+                        // Adiciona novas opções
+                        for (const [value, label] of Object.entries(options)) {
+                            const option = document.createElement('option');
+                            option.value = value;
+                            option.textContent = label;
+                            selectEl.appendChild(option);
+                        }
+                    }
+                } catch (error) {
+                    console.error(`Erro ao carregar ${campo}:`, error);
+                }
             }
         }
 

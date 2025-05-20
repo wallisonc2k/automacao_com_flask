@@ -14,18 +14,16 @@ db = SQLAlchemy(app)
 ma = Marshmallow(app)
 jwt = JWTManager(app)
 
-from api.models import pallet_model
-from api.controller import pallet_controller
+from api.models import pallet_model, config_model
+from api.controller import pallet_controller, config_controller
 
 app.register_blueprint(pallet_controller.pallet_bp, url_prefix='/api')
+app.register_blueprint(config_controller.configuracao_bp)
+
 
 @app.route("/")
 def home():
     return render_template('index.html')
-
-@app.route("/configuracao")
-def configuracao():
-    return render_template('configuracao.html')
 
 @app.route("/pallets")
 def pallets():
