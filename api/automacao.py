@@ -14,7 +14,8 @@ import keyboard
 import json
 from api.service.config_service import obter_configuracao_texto
 from typing import Optional
-
+from api.schemas.pallet_schema import *
+from typing import Dict, Any
 
 class GvsSystem:
     def __init__(
@@ -147,7 +148,7 @@ class GvsSystem:
             print(f"Ocorreu um erro: {str(e)}")
 
 
-class RegistroPallet(GvsSystem):
+class RegistroPalletManager(GvsSystem):
     def __init__(
         self,
         usuario: Optional[str] = None,
@@ -157,183 +158,100 @@ class RegistroPallet(GvsSystem):
         server: Optional[str] = None
     ):
         super().__init__(usuario, senha, url_base, path_cookies, server)
-        
+
         self.url_registro_pallets = self.url_base + '/admin/registroPallet'
         self.lista_pallets = []
         self.lista_pallets_id = []
-        self.pallet = {}
+        self.pallet: Optional[RegistroPallet] = None
 
-    def realizar_lancamento_pallet(self, pallet, imprimir_etiqueta=True):
+    def realizar_lancamento_pallet(self, registro: RegistroPallet, imprimir_etiqueta=True):
         self.fazer_login()
-        self.atualizar_campos(pallet)
-        for a in range(self.pallet['quantidade_pallets']):
-            self.cabecalho_pallet()
-            self.save()
-            for a_latada, a_q_caixas, observacao in zip(self.pallet['list_latadas'], self.pallet['list_q_caixas'], self.pallet['observacoes']):
-                self.montagem_pallet(a_latada, a_q_caixas, observacao)
-                self.save()
-                sleep(3)
+        self.pallet = registro
 
-            # Esperando página carregar para encontrar o id
-            self.pallet['id'] = self.driver.find_element(By.ID , "registroPalletID").get_attribute("value")
-            self.lista_pallets_id.append(self.pallet['id'])
+        self.cabecalho_pallet()
+        self.save()
+        for item in registro.itens:
+            self.montagem_pallet(item)
+            self.save()
+            sleep(3)
+
+            pallet_id = self.driver.find_element(By.ID, "registroPalletID").get_attribute("value")
+            self.lista_pallets_id.append(pallet_id)
 
             if imprimir_etiqueta:
-                self.imprimir_etiqueta(self.pallet['id'])
+                self.imprimir_etiqueta(pallet_id)
 
-    def realizar_lancamento_pallets(self, pallets, imprimir_etiqueta=True):
-        if isinstance(pallets, pd.DataFrame):
-            pallets.dropna(inplace=True)
-            for col in pallets.select_dtypes('number').columns:
-                pallets[col] = pallets[col].astype('int')
+    def realizar_lancamento_pallets(self, dados: List[dict], imprimir_etiqueta=True):
+        for data in dados:
+            registro = self.criar_registro_pallet(data)
+            self.realizar_lancamento_pallet(registro, imprimir_etiqueta)
 
-            for index, pallet in pallets.iterrows():
-                self.realizar_lancamento_pallet(pallet, imprimir_etiqueta)
-
-
-    def atualizar_campos(self, pallet):
-        self.pallet['t_embalagem'] = str(pallet["tipo_de_caixa"])
-        self.pallet['des_prod'] = str(pallet["des_produto"])
-        self.pallet['cliente'] = str(pallet["cliente"])
-        self.pallet['etiqueta'] = str(pallet["tipo_de_etiqueta"])
-        self.pallet['esteira'] = str(pallet["esteira"])
-        self.pallet['list_latadas'] = str(pallet["latada"]).split("+")
-        self.pallet['list_q_caixas'] = str(pallet["q_caixas"]).split("+")
-        self.pallet['cor'] = str(pallet["cor"])
-        self.pallet['calibre'] = str(pallet["calibre"])
-        self.pallet['brix'] = str(pallet["brix"])
-        self.pallet['quantidade_pallets'] = int(pallet["q_pallets"])
-        self.pallet['processo_interno'] = str(pallet["processo_interno"])
-        self.pallet['local_de_estoque'] = str(pallet["local_de_estoque"])
-        self.pallet['observacoes'] = str(pallet['observacoes']).split("+")
+    @staticmethod
+    def criar_registro_pallet(data: Dict[str, Any]) -> RegistroPallet:
+        cabecalho = CabecalhoPallet(**data["cabecalho"])
+        itens = [ItemPallet(**item) for item in data["itens"]]
+        return RegistroPallet(cabecalho=cabecalho, itens=itens)
 
     def selecionar_opcao_por_index(self, elemento, index):
-        select = Select(elemento)
-        select.select_by_index(index)
-
+        Select(elemento).select_by_index(index)
 
     def selecionar_opcao_por_value(self, elemento, value):
-        select = Select(elemento)
-        select.select_by_value(value)
-
+        Select(elemento).select_by_value(str(value))
 
     def cabecalho_pallet(self):
-        # lancamento do pallet
+        cab = self.pallet.cabecalho
+
         self.driver.get(self.url_registro_pallets)
-        self.driver.find_element(By.XPATH , '//*[@id="mainHeaderRigth"]/div/button/i').click()
+        self.driver.find_element(By.XPATH, '//*[@id="mainHeaderRigth"]/div/button/i').click()
 
-        # Tipo de Fruta padrão igual a UVA: 3
-        tipo_de_fruta = self.driver.find_element(By.NAME , 'categoria_id')
-        self.selecionar_opcao_por_index(tipo_de_fruta, 3)
+        self.selecionar_opcao_por_index(self.driver.find_element(By.NAME, 'categoria_id'), 3)
+        self.selecionar_opcao_por_value(self.driver.find_element(By.NAME, 'embalagem_id'), cab.tipo_de_caixa)
+        self.selecionar_opcao_por_value(self.driver.find_element(By.NAME, 'local_estoque_id'), cab.local_de_estoque)
+        self.selecionar_opcao_por_value(self.driver.find_element(By.NAME, 'cliente_item_id'), cab.cliente)
+        self.selecionar_opcao_por_value(self.driver.find_element(By.NAME, 'produto_id'), cab.des_produto)
+        self.selecionar_opcao_por_value(self.driver.find_element(By.NAME, 'etiqueta_id'), cab.tipo_de_etiqueta)
+        self.selecionar_opcao_por_value(self.driver.find_element(By.NAME, 'processo_interno'), cab.processo_interno)
 
-        tipo_de_embalagem = self.driver.find_element(By.NAME , 'embalagem_id')
-        self.selecionar_opcao_por_value(tipo_de_embalagem, self.pallet['t_embalagem'])
-
-        local_de_estoque = self.driver.find_element(By.NAME , 'local_estoque_id')
-        self.selecionar_opcao_por_value(local_de_estoque, self.pallet['local_de_estoque'])
-
-        cliente_exp = self.driver.find_element(By.NAME , 'cliente_item_id')
-        self.selecionar_opcao_por_value(cliente_exp, self.pallet['cliente'])
-
-        descricao = self.driver.find_element(By.NAME , 'produto_id')
-        self.selecionar_opcao_por_value(descricao, self.pallet['des_prod'])
-
-        etiqueta = self.driver.find_element(By.NAME , 'etiqueta_id')
-        self.selecionar_opcao_por_value(etiqueta, self.pallet['etiqueta'])
-
-        processo_interno = self.driver.find_element(By.NAME , 'processo_interno')
-        self.selecionar_opcao_por_value(processo_interno, self.pallet['processo_interno'])
-
-        nome_do_pallet = self.driver.find_element(By.ID , 'registroPalletCodPallet').get_attribute('value')
+        nome_do_pallet = self.driver.find_element(By.ID, 'registroPalletCodPallet').get_attribute('value')
         self.lista_pallets.append(nome_do_pallet)
 
+    def montagem_pallet(self, item: ItemPallet):
+        novo_item_btn = self.driver.find_element(By.XPATH, '//*[@id="registroPalletManagementId"]/div[2]/div/div[3]/span/button[1]')
+        self.driver.execute_script("arguments[0].scrollIntoView();", novo_item_btn)
+        novo_item_btn.click()
 
-    def montagem_pallet(self, a_latada, a_q_caixas, observacao):
-        novo_item = self.driver.find_element(By.XPATH, '//*[@id="registroPalletManagementId"]/div[2]/div/div[3]/span/button[1]')
-        try:
-            # Role a página para que o elemento fique visível
-            self.driver.execute_script("arguments[0].scrollIntoView();", novo_item)
-
-            # Clique no elemento
-            novo_item.click()
-
-        except Exception as e:
-            print(f"Ocorreu um erro: {str(e)}")
-
-        # montagem do pallet
-        produtor = self.driver.find_element(By.NAME , 'produtor_id')
-        self.selecionar_opcao_por_value(produtor, "255")
+        sleep(1)
+        self.selecionar_opcao_por_value(self.driver.find_element(By.NAME, 'produtor_id'), "255")
         sleep(2)
+        self.selecionar_opcao_por_value(self.driver.find_element(By.NAME, 'esteira_id'), item.esteira)
 
-        esteira = self.driver.find_element(By.NAME , 'esteira_id')
-        self.selecionar_opcao_por_value(esteira, self.pallet['esteira'])
+        self.driver.find_element(By.ID, 'select2-registroPalletItemLatada-container').click()
+        latada_input = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "/html/body/span/span/span[1]/input"))
+        )
+        latada_input.send_keys(item.latada)
+        latada_input.send_keys(Keys.ENTER)
 
-        self.driver.find_element(By.XPATH , '//*[@id="select2-registroPalletItemLatada-container"]').click()
+        self.driver.find_element(By.ID, 'registroPalletItemQuantidade').send_keys(str(item.q_caixas))
 
-        try:
-            latada = WebDriverWait(self.driver, 10).until(
-                EC.presence_of_element_located((By.XPATH, "/html/body/span/span/span[1]/input"))
-            )
-            # Faça algo com o elemento após ele ser localizado
-            latada.send_keys(a_latada)
-            latada.send_keys(Keys.ENTER)
-        except Exception as e:
-            print(f"Ocorreu um erro: {str(e)}")
+        self.driver.find_element(By.ID, 'select2-registroPalletItemColor-container').click()
+        cor_input = self.driver.find_element(By.XPATH, '/html/body/span/span/span[1]/input')
+        cor_input.send_keys(item.cor)
+        cor_input.send_keys(Keys.ENTER)
 
+        self.driver.find_element(By.ID, 'select2-registroPalletItemCalibre-container').click()
+        calibre_input = self.driver.find_element(By.XPATH, '/html/body/span/span/span[1]/input')
+        calibre_input.send_keys(str(item.calibre))
+        calibre_input.send_keys(Keys.ENTER)
 
-        q_caixas = self.driver.find_element(By.XPATH ,  '//*[@id="registroPalletItemQuantidade"]')
-        q_caixas.send_keys(a_q_caixas)
+        self.driver.find_element(By.ID, 'select2-registroPalletItemBrix-container').click()
+        brix_input = self.driver.find_element(By.XPATH, '/html/body/span/span/span[1]/input')
+        brix_input.send_keys(str(item.brix))
+        brix_input.send_keys(Keys.ENTER)
 
-        self.driver.find_element(By.XPATH , '//*[@id="select2-registroPalletItemColor-container"]').click()
-        cor = self.driver.find_element(By.XPATH , '/html/body/span/span/span[1]/input')
-        cor.send_keys(self.pallet['cor'])
-        cor.send_keys(Keys.ENTER)
-
-        self.driver.find_element(By.XPATH , '//*[@id="select2-registroPalletItemCalibre-container"]').click()
-        calibre = self.driver.find_element(By.XPATH , '/html/body/span/span/span[1]/input')
-        calibre.send_keys(self.pallet['calibre'])
-        calibre.send_keys(Keys.ENTER)
-
-        self.driver.find_element(By.XPATH , '//*[@id="select2-registroPalletItemBrix-container"]').click()
-        brix = self.driver.find_element(By.XPATH , '/html/body/span/span/span[1]/input')
-        brix.send_keys(self.pallet['brix'])
-        brix.send_keys(Keys.ENTER)
-
-        if observacao:
-            observacoes = self.driver.find_element(By.NAME , "situacao_fruta_ajuda1")
-            select = Select(observacoes)
-            select.select_by_visible_text(observacao)
-
-
-    def save(self):
-        btn_salvar = self.driver.find_element(By.CSS_SELECTOR, '.actionSave')
-        try:
-            # Role a página para que o elemento fique visível
-            self.driver.execute_script("arguments[0].scrollIntoView();", btn_salvar)
-
-            # Clique no elemento
-            btn_salvar.click()
-
-        except Exception as e:
-            print(f"Ocorreu um erro: {str(e)}")
-
-
-    def criar_link(self, id):
-        return self.url_base + f"/admin/registroPallet/printOut/{id}/1"
-
-
-    def imprimir_etiqueta(self, id):
-        self.driver.get(self.criar_link(id))
-        for i in range(2):
-            self.driver.execute_script("window.print();")
-            sleep(2)
-            keyboard.press_and_release("enter")
-            sleep(2)
-
-
-    def imprimir_etiquetas(self):
-        for id in self.lista_pallets_id:
-            self.imprimir_etiqueta(id)
+        if item.observacoes:
+            observacoes = self.driver.find_element(By.NAME, "situacao_fruta_ajuda1")
+            Select(observacoes).select_by_visible_text(item.observacoes)
 
 
 class Cabines(GvsSystem):

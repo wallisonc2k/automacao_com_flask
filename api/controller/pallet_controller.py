@@ -10,7 +10,7 @@ from api.service.pallet_service import (
 from flask_jwt_extended import jwt_required
 from datetime import datetime
 from pydantic import ValidationError
-from api.automacao import RegistroPallet as AutomacaoRegistroPallet
+from api.automacao import RegistroPalletManager
 
 pallet_bp = Blueprint('pallet', __name__)
 
@@ -448,7 +448,7 @@ def remover_item(item_id):
                     "message": f"Item com ID {item_id} não encontrado"
                 }), 404
             )
-        
+        AutomacaoRegistroPallet
         return make_response(
             jsonify({
                 "message": f"Item com ID {item_id} removido com sucesso"
@@ -479,8 +479,8 @@ def lancar_pallet_gvssystem():
 
         # Iniciando automaçao
         try:
-            automacao = AutomacaoRegistroPallet()
-            print(dados)
+            automacao = RegistroPalletManager()
+            automacao.realizar_lancamento_pallet(registro_pallet)
 
         except Exception as e:
             return make_response(jsonify({"message": "Problema no automacao.py", "errors": e.errors()}), 400)
