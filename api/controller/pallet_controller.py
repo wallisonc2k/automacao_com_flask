@@ -10,6 +10,7 @@ from api.service.pallet_service import (
 from flask_jwt_extended import jwt_required
 from datetime import datetime
 from pydantic import ValidationError
+from api.automacao import RegistroPallet as AutomacaoRegistroPallet
 
 pallet_bp = Blueprint('pallet', __name__)
 
@@ -458,6 +459,44 @@ def remover_item(item_id):
         return make_response(
             jsonify({
                 "message": "Erro ao remover item do pallet",
+                "error": str(e)
+            }), 500
+        )
+
+@pallet_bp.route('/pallets/lancar_pallet_gvssystem', methods=['POST'])
+def lancar_pallet_gvssystem():
+    """
+    Cria usa selenium para lancar o pallet no GvsSystem
+    """
+    try:
+        dados = request.get_json()
+        
+        # Usar Pydantic para validação
+        try:
+            registro_pallet = RegistroPallet(**dados)
+        except ValidationError as e:
+            return make_response(jsonify({"message": "Dados inválidos", "errors": e.errors()}), 400)
+
+        # Iniciando automaçao
+        try:
+            automacao = AutomacaoRegistroPallet()
+            print(dados)
+
+        except Exception as e:
+            return make_response(jsonify({"message": "Problema no automacao.py", "errors": e.errors()}), 400)
+ 
+        # Retornar resposta
+        return make_response(
+            jsonify({
+                "message": "Pallet lançado com sucesso",
+                "data": dados
+            }), 200
+        )
+    
+    except Exception as e:
+        return make_response(
+            jsonify({
+                "message": "Erro ao cadastrar pallet",
                 "error": str(e)
             }), 500
         )

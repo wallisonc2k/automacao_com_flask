@@ -12,22 +12,30 @@ from selenium.webdriver.common.action_chains import ActionChains
 import pandas as pd
 import keyboard
 import json
-
-"https://meurh.gvscompany.com.br"
+from api.service.config_service import obter_configuracao_texto
+from typing import Optional
 
 
 class GvsSystem:
-    url_base = "http://192.168.1.114"
-    
-    def __init__(self, usuario, senha, path_cookies='sessao.pkl', server=None):
-        self.usuario = usuario
-        self.senha = senha
+    def __init__(
+        self,
+        usuario: Optional[str] = None,
+        senha: Optional[str] = None,
+        url_base: Optional[str] = None,
+        path_cookies: str = 'sessao.pkl',
+        server: Optional[str] = None
+    ):
+        # Carrega as configurações do banco apenas se não forem passadas
+        self.url_base = url_base or obter_configuracao_texto("url_base") or "http://192.168.1.114"
+        self.usuario = usuario or obter_configuracao_texto("usuario")
+        self.senha = senha or obter_configuracao_texto("senha")
+
         self.url_login = self.url_base + "/admin/login"
         self.cookies = []
         self.caminho_cookies = self.obter_caminho_cookies(path_cookies)    
         self.driver = None
         self.server = server
-    
+
     def __del__(self):
         self.fechar_driver()
     
@@ -139,11 +147,17 @@ class GvsSystem:
             print(f"Ocorreu um erro: {str(e)}")
 
 
-
-
 class RegistroPallet(GvsSystem):
-    def __init__(self, usuario, senha):
-        super().__init__(usuario, senha, path_cookies='sessao.pkl', server=None)
+    def __init__(
+        self,
+        usuario: Optional[str] = None,
+        senha: Optional[str] = None,
+        url_base: Optional[str] = None,
+        path_cookies: str = 'sessao.pkl',
+        server: Optional[str] = None
+    ):
+        super().__init__(usuario, senha, url_base, path_cookies, server)
+        
         self.url_registro_pallets = self.url_base + '/admin/registroPallet'
         self.lista_pallets = []
         self.lista_pallets_id = []

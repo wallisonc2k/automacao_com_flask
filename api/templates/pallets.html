@@ -206,6 +206,7 @@
         const modalClose = document.getElementById('modal-close');
         const itemModalClose = document.getElementById('item-modal-close');
         const savePalletBtn = document.getElementById('save-pallet-btn');
+        const imprimirPalletBtn = document.getElementById('imprimir-pallet-btn');
         const saveItemBtn = document.getElementById('save-item-btn');
         const deletePalletBtn = document.getElementById('delete-pallet-btn');
         const addItemBtn = document.getElementById('add-item-btn');
@@ -220,6 +221,7 @@
         modalClose.addEventListener('click', closePalletModal);
         itemModalClose.addEventListener('click', closeItemModal);
         savePalletBtn.addEventListener('click', savePallet);
+        imprimirPalletBtn.addEventListener('click', imprimirPallet)
         saveItemBtn.addEventListener('click', saveItem);
         deletePalletBtn.addEventListener('click', deletePallet);
         addItemBtn.addEventListener('click', () => openItemModal());
@@ -424,6 +426,28 @@
                 // };
                 // pallets.push(newPallet);
                 // return newPallet;
+            } catch (error) {
+                showToast('Erro ao criar pallet: ' + error.message, 'error');
+                throw error;
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function createPalletGvsSystem(palletData) {
+            showLoading();
+            try {
+                // In a real application, send to API
+                const response = await fetch(`${API_BASE_URL}/pallets/lancar_pallet_gvssystem`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(palletData)
+                });
+                if (!response.ok) throw new Error('Falha ao criar pallet no GvsSystem');
+                return await response.json();
+            
             } catch (error) {
                 showToast('Erro ao criar pallet: ' + error.message, 'error');
                 throw error;
@@ -719,6 +743,7 @@
                 fillPalletForm(currentPallet);
                 renderItems();
                 deletePalletBtn.style.display = 'block';
+                imprimirPalletBtn.style.display = 'block';
             } else {
                 // New pallet
                 currentPallet = {
@@ -728,6 +753,7 @@
                 document.getElementById('modal-title').textContent = 'Novo Pallet';
                 itemContainer.innerHTML = '';
                 deletePalletBtn.style.display = 'none';
+                imprimirPalletBtn.style.display = 'none';
             }
             
             // Show modal
@@ -790,6 +816,25 @@
                 showToast('Erro ao salvar pallet: ' + error.message, 'error');
             }
         }
+
+        async function imprimirPallet() {
+            try {
+                if (!validatePalletForm()) return;
+                
+                const palletData = getPalletFormData();
+                
+                // Create new pallet in GvsSystem
+                await createPalletGvsSystem(palletData);
+                showToast('Pallet criado com sucesso no GvsSystem', 'success');
+
+                
+                closePalletModal();
+                loadPallets();
+            } catch (error) {
+                showToast('Erro ao imprimir pallet: ' + error.message, 'error');
+            }
+        }
+
 
         async function saveItem() {
             try {
