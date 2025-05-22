@@ -26,8 +26,8 @@
                         <select id="cliente-filter" class="form-control">
                             <option value="">Todos os Clientes</option>
                         </select>
-                        <select id="produto-filter" class="form-control">
-                            <option value="">Todos os Produtos</option>
+                        <select id="caixa-filter" class="form-control">
+                            <option value="">Todos os Caixas</option>
                         </select>
                         <input type="date" id="data-inicial-filter" class="form-control" placeholder="Data Inicial">
                         <input type="date" id="data-final-filter" class="form-control" placeholder="Data Final">
@@ -253,7 +253,7 @@
                 // Add query params for filters
                 const queryParams = new URLSearchParams();
                 if (filters.cliente) queryParams.append('cliente', filters.cliente);
-                if (filters.produto) queryParams.append('produto', filters.produto);
+                if (filters.tipo_de_caixa) queryParams.append('tipo_de_caixa', filters.tipo_de_caixa);
                 if (filters.data_inicial) queryParams.append('data_inicial', filters.data_inicial);
                 if (filters.data_final) queryParams.append('data_final', filters.data_final);
                 
@@ -365,6 +365,29 @@
                     const options = data.valor_json;
                     const selectEl = document.getElementById(campo.replace(/_/g, '-'));
 
+                    let selectfiltro = ""
+                    if (campo == "cliente" || campo == "tipo_caixa") {
+                        if (campo == "cliente"){
+                            selectfiltro = document.getElementById("cliente-filter");
+                        } else {
+                            selectfiltro = document.getElementById("caixa-filter");
+                        }
+
+                        if (selectfiltro && options) {
+                            selectfiltro.innerHTML = '<option value="">Todos os Clientes</option>';
+
+
+
+                            // Adiciona novas opções
+                            for (const [value, label] of Object.entries(options)) {
+                                const option = document.createElement('option');
+                                option.value = value;
+                                option.textContent = label;
+                                selectfiltro.appendChild(option);
+                            }
+                        }
+                    }
+
                     if (selectEl && options) {
                         // Limpa as opções atuais
                         selectEl.innerHTML = '<option value="">Selecione</option>';
@@ -375,6 +398,8 @@
                             option.value = value;
                             option.textContent = label;
                             selectEl.appendChild(option);
+
+
                         }
                     }
                 } catch (error) {
@@ -899,13 +924,13 @@
 
         function filterPallets() {
             const cliente = document.getElementById('cliente-filter').value;
-            const produto = document.getElementById('produto-filter').value;
+            const tipo_de_caixa = document.getElementById('caixa-filter').value;
             const dataInicial = document.getElementById('data-inicial-filter').value;
             const dataFinal = document.getElementById('data-final-filter').value;
             
             loadPallets({
                 cliente,
-                produto,
+                tipo_de_caixa,
                 data_inicial: dataInicial,
                 data_final: dataFinal
             });

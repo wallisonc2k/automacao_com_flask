@@ -200,13 +200,13 @@ def remover_item_pallet(item_id):
     return False
 
 
-def buscar_pallets_por_filtros(cliente=None, produto=None, data_inicial=None, data_final=None):
+def buscar_pallets_por_filtros(cliente=None, tipo_de_caixa=None, data_inicial=None, data_final=None):
     """
     Busca pallets com base em filtros específicos
     
     Args:
         cliente: ID do cliente (opcional)
-        produto: ID do produto (opcional)
+        tipo_de_caixa: ID do tipo_de_caixa (opcional)
         data_inicial: Data inicial para filtro (opcional)
         data_final: Data final para filtro (opcional)
     
@@ -218,8 +218,8 @@ def buscar_pallets_por_filtros(cliente=None, produto=None, data_inicial=None, da
     if cliente:
         query = query.filter(CabecalhoPalletModel.cliente == cliente)
     
-    if produto:
-        query = query.filter(CabecalhoPalletModel.des_produto == produto)
+    if tipo_de_caixa:
+        query = query.filter(CabecalhoPalletModel.tipo_de_caixa == tipo_de_caixa)
     
     if data_inicial:
         query = query.filter(CabecalhoPalletModel.data_criacao >= data_inicial)

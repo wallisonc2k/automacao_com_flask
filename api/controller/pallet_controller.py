@@ -102,7 +102,7 @@ def obter_pallets():
     """
     try:
         cliente = request.args.get('cliente', type=int)
-        produto = request.args.get('produto', type=int)
+        tipo_de_caixa = request.args.get('tipo_de_caixa', type=int)
         data_inicial_str = request.args.get('data_inicial')
         data_final_str = request.args.get('data_final')
 
@@ -111,8 +111,8 @@ def obter_pallets():
         if data_final:
             data_final = data_final.replace(hour=23, minute=59, second=59)
 
-        if cliente or produto or data_inicial or data_final:
-            pallets = buscar_pallets_por_filtros(cliente, produto, data_inicial, data_final)
+        if cliente or tipo_de_caixa or data_inicial or data_final:
+            pallets = buscar_pallets_por_filtros(cliente, tipo_de_caixa, data_inicial, data_final)
         else:
             pallets = listar_pallets()
 

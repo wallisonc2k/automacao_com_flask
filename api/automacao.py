@@ -9,7 +9,6 @@ import os
 import joblib
 from datetime import datetime
 from selenium.webdriver.common.action_chains import ActionChains
-import pandas as pd
 import keyboard
 import json
 from api.service.config_service import obter_configuracao_texto
