@@ -58,12 +58,13 @@ class GvsSystem:
             else:
                 preferencias_do_chrome = {
                     'printing.print_preview_sticky_settings.appState': json.dumps({
-                        "recentDestinations": [{"id": "ZEBRA 2", "origin": "local"}],
-                        # "recentDestinations": [{"id": "PALLETS", "origin": "local"}],
+                        #"recentDestinations": [{"id": "ZEBRA 2", "origin": "local"}],
+                        "recentDestinations": [{"id": "PALLETS", "origin": "local"}],
                         "selectedDestinationId": "PALLETS",
                         "version": 2,
                         "scalingType": 3,
-                        "scaling": "93"  # Escalonamento específico para execução local
+                        "scaling": "100",
+                        "copies": 2,
                     }),
                     'savefile.default_directory': '/path/to/save'
                 }
@@ -174,11 +175,21 @@ class RegistroPalletManager(GvsSystem):
             self.save()
             sleep(3)
 
-            pallet_id = self.driver.find_element(By.ID, "registroPalletID").get_attribute("value")
-            self.lista_pallets_id.append(pallet_id)
+        pallet_id = self.driver.find_element(By.ID, "registroPalletID").get_attribute("value")
+        self.lista_pallets_id.append(pallet_id)
 
-            if imprimir_etiqueta:
-                self.imprimir_etiqueta(pallet_id)
+        print(pallet_id)
+
+        if imprimir_etiqueta:
+            self.imprimir_etiqueta(pallet_id)
+
+    def imprimir_etiqueta(self, pallet_id):
+        self.driver.get(f"{self.url_base}/admin/registroPallet/printOut/{pallet_id}/1")
+        sleep(10)
+        self.driver.execute_script("window.print();")
+        sleep(5)
+        self.driver.execute_script("window.print();")
+        sleep(5)
 
     def realizar_lancamento_pallets(self, dados: List[dict], imprimir_etiqueta=True):
         for data in dados:
@@ -203,16 +214,27 @@ class RegistroPalletManager(GvsSystem):
         self.driver.get(self.url_registro_pallets)
         self.driver.find_element(By.XPATH, '//*[@id="mainHeaderRigth"]/div/button/i').click()
 
-        self.selecionar_opcao_por_index(self.driver.find_element(By.NAME, 'categoria_id'), 3)
+        self.selecionar_opcao_por_index(self.driver.find_element(By.NAME, 'categoria_id'), 4)
+        #sleep(3)
         self.selecionar_opcao_por_value(self.driver.find_element(By.NAME, 'embalagem_id'), cab.tipo_de_caixa)
+        #sleep(3)
         self.selecionar_opcao_por_value(self.driver.find_element(By.NAME, 'local_estoque_id'), cab.local_de_estoque)
+        #sleep(3)
         self.selecionar_opcao_por_value(self.driver.find_element(By.NAME, 'cliente_item_id'), cab.cliente)
+        #sleep(3)
         self.selecionar_opcao_por_value(self.driver.find_element(By.NAME, 'produto_id'), cab.des_produto)
+        #sleep(3)
         self.selecionar_opcao_por_value(self.driver.find_element(By.NAME, 'etiqueta_id'), cab.tipo_de_etiqueta)
+        #sleep(3)
         self.selecionar_opcao_por_value(self.driver.find_element(By.NAME, 'processo_interno'), cab.processo_interno)
+        #sleep(3)
 
         nome_do_pallet = self.driver.find_element(By.ID, 'registroPalletCodPallet').get_attribute('value')
         self.lista_pallets.append(nome_do_pallet)
+
+        print(nome_do_pallet)
+
+    
 
     def montagem_pallet(self, item: ItemPallet):
         novo_item_btn = self.driver.find_element(By.XPATH, '//*[@id="registroPalletManagementId"]/div[2]/div/div[3]/span/button[1]')
@@ -251,6 +273,21 @@ class RegistroPalletManager(GvsSystem):
         if item.observacoes:
             observacoes = self.driver.find_element(By.NAME, "situacao_fruta_ajuda1")
             Select(observacoes).select_by_visible_text(item.observacoes)
+            
+    def save(self):
+        print("save -----------------------------------------------------------------------------") 
+        btn_salvar = self.driver.find_element(By.CLASS_NAME, 'actionSave')
+        try:
+            # Role a página para que o elemento fique visível
+            self.driver.execute_script("arguments[0].scrollIntoView();", btn_salvar)
+
+            # Clique no elemento
+            btn_salvar.click()
+
+            
+        except Exception as e:
+            print(f"Ocorreu um erro: {str(e)}")
+
 
 
 class Cabines(GvsSystem):
@@ -294,8 +331,8 @@ class Cabines(GvsSystem):
 
             # Clique no elemento
             btn_salvar.click()
-            link = self.criar_link()
-            self.imprimir_codigo_cabine(link)
+            
+           
             
         except Exception as e:
             print(f"Ocorreu um erro: {str(e)}")
@@ -307,6 +344,6 @@ class Cabines(GvsSystem):
 
     def imprimir_codigo_cabine(self, link):
         self.driver.get(link)
-        sleel(10)
+        sleep(10)
         self.driver.execute_script("window.print();")
         sleep(5)
