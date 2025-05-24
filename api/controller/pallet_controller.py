@@ -4,7 +4,7 @@ from api.schemas.pallet_schema import CabecalhoPallet, ItemPallet, RegistroPalle
 from api.service.pallet_service import (
     cadastrar_pallet, listar_pallets, listar_pallet_by_id, listar_itens_pallet,
     deletar_pallet, atualizar_pallet, adicionar_item_pallet, remover_item_pallet,
-    buscar_pallets_por_filtros
+    buscar_pallets_por_filtros, valores_para_filtros
 )
 #from api.paginate import paginate
 from flask_jwt_extended import jwt_required
@@ -116,6 +116,9 @@ def obter_pallets():
         else:
             pallets = listar_pallets()
 
+        filtros = valores_para_filtros()
+        
+
         resultado = []
         for p in pallets:
             itens_bd = listar_itens_pallet(p.id)
@@ -153,7 +156,7 @@ def obter_pallets():
                 "data_criacao": p.data_criacao.isoformat() if p.data_criacao else None
             })
 
-        return make_response(jsonify({"pallets": resultado}), 200)
+        return make_response(jsonify({"pallets": resultado, "filtros": filtros}), 200)
 
     except Exception as e:
         return make_response(jsonify({

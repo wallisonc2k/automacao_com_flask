@@ -2,7 +2,7 @@ from api import db
 from api.models.pallet_model import CabecalhoPalletModel, ItemPalletModel
 from sqlalchemy import func
 from datetime import datetime
-from typing import List
+from typing import List, Dict
 
 def cadastrar_pallet(cabecalho, itens):
     """
@@ -228,3 +228,48 @@ def buscar_pallets_por_filtros(cliente=None, tipo_de_caixa=None, data_inicial=No
         query = query.filter(CabecalhoPalletModel.data_criacao <= data_final)
     
     return query.all()
+
+def valores_para_filtros() -> Dict[str, List[Dict[str, str]]]:
+    """
+    Retorna dois arrays de dicionários:
+      - tipos_de_caixa: [{ "valor": <int>, "texto": <str> }, ... ]
+      - clientes:      [{ "valor": <int>, "texto": <str> }, ... ]
+    Pronto para serialização em JSON e uso em selects no frontend.
+    """
+
+    # Query de tipos de caixa
+    tipos = (
+        db.session
+          .query(
+             CabecalhoPalletModel.tipo_de_caixa.label("valor"),
+             CabecalhoPalletModel.tex_tipoCaixa.label("texto"),
+          )
+          .distinct()
+          .order_by(CabecalhoPalletModel.tex_tipoCaixa)
+          .all()
+    )
+
+    # Query de clientes
+    clientes = (
+        db.session
+          .query(
+             CabecalhoPalletModel.cliente.label("valor"),
+             CabecalhoPalletModel.tex_cliente.label("texto"),
+          )
+          .distinct()
+          .order_by(CabecalhoPalletModel.tex_cliente)
+          .all()
+    )
+
+    # Monta o payload
+    filtros = {
+        "tipos_de_caixa": [
+            {"valor": valor, "texto": texto} for valor, texto in tipos
+        ],
+        "clientes": [
+            {"valor": valor, "texto": texto} for valor, texto in clientes
+        ],
+    }
+
+    return filtros
+

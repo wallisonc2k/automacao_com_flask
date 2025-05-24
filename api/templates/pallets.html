@@ -269,81 +269,8 @@
                 const data = await response.json();
                 pallets = data.pallets;
                 
-                // Mock data for demonstration
-                // pallets = [
-                // {
-                //         id: 1,
-                //         cabecalho: {
-                //             tipo_de_caixa: 1,
-                //             tex_tipoCaixa: "Caixa Tipo A",
-                //             des_produto: 1,
-                //             tex_descProduto: "Uva Thompson",
-                //             cliente: 1,
-                //             tex_cliente: "Cliente ABC",
-                //             tipo_de_etiqueta: 1,
-                //             tex_tipoEtiqueta: "Etiqueta Padrão",
-                //             local_de_estoque: 1,
-                //             tex_localEstoque: "Armazém Principal",
-                //             processo_interno: "PRO-2023-001"
-                //         },
-                //         itens: [
-                //             {
-                //                 id: 1,
-                //                 esteira: 1,
-                //                 tex_esteira: "Esteira Principal",
-                //                 latada: 123,
-                //                 q_caixas: 50,
-                //                 cor: "Verde",
-                //                 calibre: 18.5,
-                //                 brix: 16.2,
-                //                 observacoes: "Qualidade excelente"
-                //             },
-                //             {
-                //                 id: 2,
-                //                 esteira: 2,
-                //                 tex_esteira: "Esteira Secundária",
-                //                 latada: 124,
-                //                 q_caixas: 30,
-                //                 cor: "Verde Claro",
-                //                 calibre: 17.8,
-                //                 brix: 15.9,
-                //                 observacoes: ""
-                //             }
-                //         ],
-                //         data_criacao: "2025-05-15T10:30:00"
-                //     },
-                //     {
-                //         id: 2,
-                //         cabecalho: {
-                //             tipo_de_caixa: 2,
-                //             tex_tipoCaixa: "Caixa Tipo B",
-                //             des_produto: 2,
-                //             tex_descProduto: "Uva Crimson",
-                //             cliente: 2,
-                //             tex_cliente: "Cliente XYZ",
-                //             tipo_de_etiqueta: 2,
-                //             tex_tipoEtiqueta: "Etiqueta Premium",
-                //             local_de_estoque: 2,
-                //             tex_localEstoque: "Armazém Secundário",
-                //             processo_interno: "PRO-2023-002"
-                //         },
-                //         itens: [
-                //             {
-                //                 id: 3,
-                //                 esteira: 1,
-                //                 tex_esteira: "Esteira Principal",
-                //                 latada: 145,
-                //                 q_caixas: 40,
-                //                 cor: "Vermelho",
-                //                 calibre: 19.2,
-                //                 brix: 17.5,
-                //                 observacoes: "Coloração perfeita"
-                //             }
-                //         ],
-                //         data_criacao: "2025-05-16T14:15:00"
-                //     }
-                // ];
-                
+                populateSelect("caixa-filter", data.filtros.tipos_de_caixa, "Selecione o tipo de caixa");
+                populateSelect("cliente-filter", data.filtros.clientes, "Selecione o cliente");
                 renderPallets();
             } catch (error) {
                 showToast('Erro ao carregar pallets: ' + error.message, 'error');
@@ -351,6 +278,43 @@
                 hideLoading();
             }
         }
+
+        /**
+         * Preenche um <select> com options a partir de um array de itens.
+         *
+         * @param {string} selectId - id do elemento <select> no DOM
+         * @param {Array<{ valor: any, texto: string }>} items - lista de opções
+         * @param {string} [placeholderText] - texto da opção placeholder (opcional)
+         */
+        function populateSelect(selectId, items, placeholderText) {
+            const selectEl = document.getElementById(selectId);
+            if (!selectEl) {
+                console.error(`populateSelect: nenhum <select> encontrado com id="${selectId}"`);
+                return;
+            }
+
+            // Limpa as options existentes
+            selectEl.innerHTML = "";
+
+            // Se houver texto de placeholder, adiciona uma opção desabilitada no topo
+            if (placeholderText) {
+                const placeholderOpt = document.createElement("option");
+                placeholderOpt.value = "";
+                placeholderOpt.textContent = placeholderText;
+                placeholderOpt.selected = true;
+                placeholderOpt.disabled = true;
+                selectEl.appendChild(placeholderOpt);
+            }
+
+            // Cria e adiciona as opções
+            items.forEach(item => {
+                const opt = document.createElement("option");
+                opt.value = item.valor;
+                opt.textContent = item.texto;
+                selectEl.appendChild(opt);
+            });
+        }
+
 
         async function preencherSelects() {
             for (const campo of CAMPOS_SELECT) {
@@ -364,29 +328,6 @@
                     const data = await response.json();
                     const options = data.valor_json;
                     const selectEl = document.getElementById(campo.replace(/_/g, '-'));
-
-                    let selectfiltro = ""
-                    if (campo == "cliente" || campo == "tipo_caixa") {
-                        if (campo == "cliente"){
-                            selectfiltro = document.getElementById("cliente-filter");
-                        } else {
-                            selectfiltro = document.getElementById("caixa-filter");
-                        }
-
-                        if (selectfiltro && options) {
-                            selectfiltro.innerHTML = '<option value="">Todos os Clientes</option>';
-
-
-
-                            // Adiciona novas opções
-                            for (const [value, label] of Object.entries(options)) {
-                                const option = document.createElement('option');
-                                option.value = value;
-                                option.textContent = label;
-                                selectfiltro.appendChild(option);
-                            }
-                        }
-                    }
 
                     if (selectEl && options) {
                         // Limpa as opções atuais
