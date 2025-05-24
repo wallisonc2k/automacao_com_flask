@@ -28,6 +28,7 @@ def cadastrar_pallet(cabecalho, itens):
         local_de_estoque=cabecalho.local_de_estoque,
         tex_localEstoque=cabecalho.tex_localEstoque,
         processo_interno=cabecalho.processo_interno,
+        q_pallets=cabecalho.q_pallets,
         data_criacao=datetime.now()
     )
     
@@ -126,6 +127,8 @@ def atualizar_pallet(pallet_bd, pallet_novo, itens_novos=None):
     pallet_bd.local_de_estoque = pallet_novo.local_de_estoque
     pallet_bd.tex_localEstoque = pallet_novo.tex_localEstoque
     pallet_bd.processo_interno = pallet_novo.processo_interno
+    pallet_bd.q_pallets = pallet_novo.q_pallets
+
     
     # Se novos itens foram fornecidos, atualizar também
     if itens_novos is not None:

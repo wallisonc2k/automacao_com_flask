@@ -18,6 +18,9 @@ class CabecalhoPallet(BaseModel):
     tex_localEstoque: str
 
     processo_interno: int
+    
+    q_pallets: Optional[int] = 1
+
 
 
 class ItemPallet(BaseModel):

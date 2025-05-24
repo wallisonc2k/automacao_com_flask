@@ -95,9 +95,15 @@
                                             <option value="">Selecione</option>
                                         </select>
                                     </div>
+                                </div>
+                                <div class="form-row">
                                     <div class="form-group">
                                         <label for="processo-interno">Processo Interno</label>
                                         <input type="text" id="processo-interno" class="form-control" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="q_pallets">Quantidade de Pallets:</label>
+                                        <input type="text" id="q_pallets" class="form-control" value="1">
                                     </div>
                                 </div>
                             </form>
@@ -565,6 +571,7 @@
                         <div class="pallet-info"><strong>Cliente:</strong> ${pallet.cabecalho.tex_cliente}</div>
                         <div class="pallet-info"><strong>Caixas:</strong> ${totalCaixas}</div>
                         <div class="pallet-info"><strong>Processo:</strong> ${pallet.cabecalho.processo_interno}</div>
+                        <div class="pallet-info"><strong>Pallets:</strong> ${pallet.cabecalho.q_pallets}</div>
                         <div class="pallet-info"><strong>Data:</strong> ${new Date(pallet.data_criacao).toLocaleDateString()}</div>
                     </div>
                     <div class="pallet-footer">
@@ -636,6 +643,7 @@
             document.getElementById('tipo-etiqueta').value = pallet.cabecalho.tipo_de_etiqueta || '';
             document.getElementById('local-estoque').value = pallet.cabecalho.local_de_estoque || '';
             document.getElementById('processo-interno').value = pallet.cabecalho.processo_interno || '';
+            document.getElementById('q_pallets').value = pallet.cabecalho.q_pallets || '';
         }
 
         function fillItemForm(item) {
@@ -662,7 +670,8 @@
                     tex_tipoEtiqueta: document.getElementById('tipo-etiqueta').options[document.getElementById('tipo-etiqueta').selectedIndex].text,
                     local_de_estoque: parseInt(document.getElementById('local-estoque').value),
                     tex_localEstoque: document.getElementById('local-estoque').options[document.getElementById('local-estoque').selectedIndex].text,
-                    processo_interno: document.getElementById('processo-interno').value
+                    processo_interno: document.getElementById('processo-interno').value,
+                    q_pallets: document.getElementById('q_pallets').value
                 },
                 itens: currentPallet ? [...currentPallet.itens] : []
             };
