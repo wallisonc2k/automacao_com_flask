@@ -829,7 +829,8 @@
                     }
                 } else {
                     // Add new item
-                    await addItemToPallet(currentPallet.id, itemData);
+                    const response = await addItemToPallet(currentPallet.id, itemData);
+                    currentPallet.itens.push(response.data);
                     showToast('Item adicionado com sucesso', 'success');
                 }
                 
