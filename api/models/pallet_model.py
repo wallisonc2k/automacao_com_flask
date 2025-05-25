@@ -23,6 +23,8 @@ class CabecalhoPalletModel(db.Model):
     tex_localEstoque = db.Column(db.String(100), nullable=False)
 
     processo_interno = db.Column(db.Integer, nullable=False)
+    tex_processo_interno = db.Column(db.String(100), nullable=False)
+    
     q_pallets = db.Column(db.Integer, nullable=False)
 
     data_criacao = db.Column(db.DateTime, nullable=False, default=func.now())

@@ -42,6 +42,7 @@ def criar_pallet():
             local_de_estoque=registro_pallet.cabecalho.local_de_estoque,
             tex_localEstoque=registro_pallet.cabecalho.tex_localEstoque,
             processo_interno=registro_pallet.cabecalho.processo_interno,
+            tex_processo_interno=registro_pallet.cabecalho.tex_processo_interno,
             q_pallets=registro_pallet.cabecalho.q_pallets
         )
         
@@ -76,6 +77,7 @@ def criar_pallet():
             "local_de_estoque": resultado.local_de_estoque, 
             "tex_localEstoque": resultado.tex_localEstoque,
             "processo_interno": resultado.processo_interno,
+            "tex_processo_interno": resultado.tex_processo_interno,
             "q_pallets": resultado.q_pallets,
             "data_criacao": resultado.data_criacao.isoformat() if resultado.data_criacao else None
         }
@@ -153,6 +155,7 @@ def obter_pallets():
                     "local_de_estoque": p.local_de_estoque,
                     "tex_localEstoque": p.tex_localEstoque,
                     "processo_interno": p.processo_interno,
+                    "tex_processo_interno": p.tex_processo_interno,
                     "q_pallets": p.q_pallets
                 },
                 "itens": itens_list,
@@ -199,6 +202,7 @@ def obter_pallet(id):
             "local_de_estoque": pallet.local_de_estoque, 
             "tex_localEstoque": pallet.tex_localEstoque,
             "processo_interno": pallet.processo_interno,
+            "tex_processo_interno": pallet.tex_processo_interno,
             "q_pallets": pallet.q_pallets
         }
         
@@ -271,6 +275,7 @@ def atualizar_pallet_route(id):
             local_de_estoque=registro_pallet.cabecalho.local_de_estoque,
             tex_localEstoque=registro_pallet.cabecalho.tex_localEstoque,
             processo_interno=registro_pallet.cabecalho.processo_interno,
+            tex_processo_interno=registro_pallet.cabecalho.tex_processo_interno,
             q_pallets=registro_pallet.cabecalho.q_pallets
         )
         
@@ -308,6 +313,7 @@ def atualizar_pallet_route(id):
             "local_de_estoque": resultado.local_de_estoque, 
             "tex_localEstoque": resultado.tex_localEstoque,
             "processo_interno": resultado.processo_interno,
+            "tex_processo_interno": resultado.tex_processo_interno,
             "q_pallets": resultado.q_pallets
         }
         

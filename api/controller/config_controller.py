@@ -15,7 +15,7 @@ configuracao_bp = Blueprint('configuracao', __name__)
 
 # Constantes
 CAMPOS_TEXTO = ['url_site', 'usuario', 'senha']
-CAMPOS_SELECT = ['tipo_caixa', 'produto', 'cliente', 'tipo_etiqueta', 'local_estoque', 'esteira', 'latada']
+CAMPOS_SELECT = ['tipo_caixa', 'produto', 'cliente', 'tipo_etiqueta', 'local_estoque', 'esteira', 'latada', 'processo_interno']
 
 
 @configuracao_bp.route('/configuracoes', methods=['GET'])

@@ -362,7 +362,7 @@ function renderPallets() {
                 <div class="pallet-info"><strong>Produto:</strong> ${pallet.cabecalho.tex_descProduto}</div>
                 <div class="pallet-info"><strong>Cliente:</strong> ${pallet.cabecalho.tex_cliente}</div>
                 <div class="pallet-info"><strong>Caixas:</strong> ${totalCaixas}</div>
-                <div class="pallet-info"><strong>Processo:</strong> ${pallet.cabecalho.processo_interno}</div>
+                <div class="pallet-info"><strong>Processo:</strong> ${pallet.cabecalho.tex_processo_interno}</div>
                 <div class="pallet-info"><strong>Pallets:</strong> ${pallet.cabecalho.q_pallets}</div>
                 <div class="pallet-info"><strong>Data:</strong> ${new Date(pallet.data_criacao).toLocaleDateString()}</div>
             </div>
@@ -434,7 +434,7 @@ function fillPalletForm(pallet) {
     $('#cliente').val(pallet.cabecalho.cliente || '').trigger('change');
     $('#tipo-etiqueta').val(pallet.cabecalho.tipo_de_etiqueta || '').trigger('change');
     $('#local-estoque').val(pallet.cabecalho.local_de_estoque || '').trigger('change');
-    document.getElementById('processo-interno').value = pallet.cabecalho.processo_interno || '';
+    $('#processo-interno').val(pallet.cabecalho.processo_interno || '').trigger('change');
     document.getElementById('q_pallets').value = pallet.cabecalho.q_pallets || '';
 }
 
@@ -463,6 +463,7 @@ function getPalletFormData() {
             local_de_estoque: parseInt(document.getElementById('local-estoque').value),
             tex_localEstoque: document.getElementById('local-estoque').options[document.getElementById('local-estoque').selectedIndex].text,
             processo_interno: document.getElementById('processo-interno').value,
+            tex_processo_interno: document.getElementById('processo-interno').options[document.getElementById('processo-interno').selectedIndex].text,
             q_pallets: document.getElementById('q_pallets').value
         },
         itens: currentPallet ? [...currentPallet.itens] : []
@@ -505,7 +506,6 @@ async function openPalletModal(palletId = null) {
         // Load pallet details
         currentPallet = await getPalletById(palletId);
         if (!currentPallet) return;
-        
         document.getElementById('modal-title').textContent = `Editar Pallet #${palletId}`;
         fillPalletForm(currentPallet);
         renderItems();

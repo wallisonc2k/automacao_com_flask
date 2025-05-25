@@ -107,7 +107,7 @@
                                 <div class="form-row">
                                     <div class="form-group">
                                         <label for="processo-interno">Processo Interno</label>
-                                        <input type="text" id="processo-interno" class="form-control" required>
+                                        <select id="processo-interno" class="form-control select2" required></select>
                                     </div>
                                     <div class="form-group">
                                         <label for="q_pallets">Quantidade de Pallets:</label>
@@ -201,7 +201,7 @@
         const API_BASE_URL = 'http://{{ api_url_ip }}:5000/api'
         const CAMPOS_SELECT = [
             'tipo_caixa', 'produto', 'cliente', 'tipo_etiqueta',
-            'local_estoque', 'esteira'
+            'local_estoque', 'esteira', 'processo_interno'
         ];
     </script>
     <script src="static/js/pallet.js"></script>
