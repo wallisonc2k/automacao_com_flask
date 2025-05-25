@@ -457,7 +457,7 @@ def remover_item(item_id):
                     "message": f"Item com ID {item_id} não encontrado"
                 }), 404
             )
-        AutomacaoRegistroPallet
+
         return make_response(
             jsonify({
                 "message": f"Item com ID {item_id} removido com sucesso"

@@ -525,16 +525,7 @@
                     method: 'DELETE'
                 });
                 if (!response.ok) throw new Error('Failed to delete item');
-                
-                // For demo, remove from mock data
-                // for (const pallet of pallets) {
-                //     const index = pallet.itens.findIndex(i => i.id === itemId);
-                //     if (index !== -1) {
-                //         pallet.itens.splice(index, 1);
-                //         return true;
-                //     }
-                // }
-                // throw new Error('Item não encontrado');
+            
             } catch (error) {
                 showToast('Erro ao excluir item: ' + error.message, 'error');
                 throw error;
