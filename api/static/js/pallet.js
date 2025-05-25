@@ -429,11 +429,11 @@ function renderItems() {
 
 function fillPalletForm(pallet) {
     document.getElementById('pallet-id').value = pallet.id || '';
-    document.getElementById('tipo-caixa').value = pallet.cabecalho.tipo_de_caixa || '';
-    document.getElementById('produto').value = pallet.cabecalho.des_produto || '';
-    document.getElementById('cliente').value = pallet.cabecalho.cliente || '';
-    document.getElementById('tipo-etiqueta').value = pallet.cabecalho.tipo_de_etiqueta || '';
-    document.getElementById('local-estoque').value = pallet.cabecalho.local_de_estoque || '';
+    $('#tipo-caixa').val(pallet.cabecalho.tipo_de_caixa || '').trigger('change');
+    $('#produto').val(pallet.cabecalho.des_produto || '').trigger('change');
+    $('#cliente').val(pallet.cabecalho.cliente || '').trigger('change');
+    $('#tipo-etiqueta').val(pallet.cabecalho.tipo_de_etiqueta || '').trigger('change');
+    $('#local-estoque').val(pallet.cabecalho.local_de_estoque || '').trigger('change');
     document.getElementById('processo-interno').value = pallet.cabecalho.processo_interno || '';
     document.getElementById('q_pallets').value = pallet.cabecalho.q_pallets || '';
 }

@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gerenciador de Pallets</title>
     <link rel="stylesheet" href="../static/css/updated_styles.css">
+
+  <!-- CSS do Select2 -->
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+  <!-- jQuery e JS do Select2 -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 </head>
 <body>
     <header>
@@ -63,13 +71,13 @@
                                 <div class="form-row">
                                     <div class="form-group">
                                         <label for="tipo-caixa">Tipo de Caixa</label>
-                                        <select id="tipo-caixa" class="form-control" required>
+                                        <select id="tipo-caixa" class="form-control select2" required>
                                             <option value="">Selecione</option>
                                         </select>
                                     </div>
                                     <div class="form-group">
                                         <label for="produto">Produto</label>
-                                        <select id="produto" class="form-control" required>
+                                        <select id="produto" class="form-control select2" required>
                                             <option value="">Selecione</option>
                                         </select>
                                     </div>
@@ -77,13 +85,13 @@
                                 <div class="form-row">
                                     <div class="form-group">
                                         <label for="cliente">Cliente</label>
-                                        <select id="cliente" class="form-control" required>
+                                        <select id="cliente" class="form-control select2" required>
                                             <option value="">Selecione</option>
                                         </select>
                                     </div>
                                     <div class="form-group">
                                         <label for="tipo-etiqueta">Tipo de Etiqueta</label>
-                                        <select id="tipo-etiqueta" class="form-control" required>
+                                        <select id="tipo-etiqueta" class="form-control select2" required>
                                             <option value="">Selecione</option>
                                         </select>
                                     </div>
@@ -91,7 +99,7 @@
                                 <div class="form-row">
                                     <div class="form-group">
                                         <label for="local-estoque">Local de Estoque</label>
-                                        <select id="local-estoque" class="form-control" required>
+                                        <select id="local-estoque" class="form-control select2" required>
                                             <option value="">Selecione</option>
                                         </select>
                                     </div>
@@ -188,14 +196,26 @@
     <div class="loading" id="loading">
         <div class="spinner"></div>
     </div>
-<script>
-    // Base URL da API
-    const API_BASE_URL = 'http://{{ api_url_ip }}:5000/api'
-    const CAMPOS_SELECT = [
-        'tipo_caixa', 'produto', 'cliente', 'tipo_etiqueta',
-        'local_estoque', 'esteira'
-    ];
-</script>
-<script src="static/js/pallet.js"></script>
+    <script>
+        // Base URL da API
+        const API_BASE_URL = 'http://{{ api_url_ip }}:5000/api'
+        const CAMPOS_SELECT = [
+            'tipo_caixa', 'produto', 'cliente', 'tipo_etiqueta',
+            'local_estoque', 'esteira'
+        ];
+    </script>
+    <script src="static/js/pallet.js"></script>
+  <script>
+    $(document).ready(function() {
+      $('.select2').select2();
+
+      // Forçar foco no campo de busca ao abrir o select
+      $('.select2').on('select2:open', function () {
+        setTimeout(function() {
+          document.querySelector('.select2-container--open .select2-search__field')?.focus();
+        }, 100); // Delay necessário para garantir que o campo foi renderizado
+      });
+    });
+  </script>
 </body>
 </html>
