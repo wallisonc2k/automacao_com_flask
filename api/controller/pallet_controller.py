@@ -43,6 +43,7 @@ def criar_pallet():
             tex_localEstoque=registro_pallet.cabecalho.tex_localEstoque,
             processo_interno=registro_pallet.cabecalho.processo_interno,
             tex_processo_interno=registro_pallet.cabecalho.tex_processo_interno,
+            data_criacao=registro_pallet.cabecalho.data_criacao,
             q_pallets=registro_pallet.cabecalho.q_pallets
         )
         
@@ -203,6 +204,7 @@ def obter_pallet(id):
             "tex_localEstoque": pallet.tex_localEstoque,
             "processo_interno": pallet.processo_interno,
             "tex_processo_interno": pallet.tex_processo_interno,
+            "data_criacao": pallet.data_criacao.isoformat() if pallet.data_criacao else None,
             "q_pallets": pallet.q_pallets
         }
         
@@ -276,6 +278,7 @@ def atualizar_pallet_route(id):
             tex_localEstoque=registro_pallet.cabecalho.tex_localEstoque,
             processo_interno=registro_pallet.cabecalho.processo_interno,
             tex_processo_interno=registro_pallet.cabecalho.tex_processo_interno,
+            data_criacao=registro_pallet.cabecalho.data_criacao,
             q_pallets=registro_pallet.cabecalho.q_pallets
         )
         
@@ -314,6 +317,7 @@ def atualizar_pallet_route(id):
             "tex_localEstoque": resultado.tex_localEstoque,
             "processo_interno": resultado.processo_interno,
             "tex_processo_interno": resultado.tex_processo_interno,
+            "data_criacao": resultado.data_criacao.isoformat() if resultado.data_criacao else None,
             "q_pallets": resultado.q_pallets
         }
         
@@ -494,9 +498,9 @@ def lancar_pallet_gvssystem():
 
         # Iniciando automaçao
         try:
-            automacao = RegistroPalletManager()
-            for i in range(registro_pallet.cabecalho.q_pallets):
-                automacao.realizar_lancamento_pallet(registro_pallet)
+            with RegistroPalletManager() as automacao:
+                for i in range(registro_pallet.cabecalho.q_pallets):
+                    automacao.realizar_lancamento_pallet(registro_pallet)
 
         except Exception as e:
             return make_response(jsonify({"message": "Problema no automacao.py", "errors": e.errors()}), 400)

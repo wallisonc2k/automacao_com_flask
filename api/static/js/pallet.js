@@ -436,6 +436,15 @@ function fillPalletForm(pallet) {
     $('#local-estoque').val(pallet.cabecalho.local_de_estoque || '').trigger('change');
     $('#processo-interno').val(pallet.cabecalho.processo_interno || '').trigger('change');
     document.getElementById('q_pallets').value = pallet.cabecalho.q_pallets || '';
+    
+    // Preencher o campo data_criacao
+    if (pallet.cabecalho.data_criacao) {
+        const data = new Date(pallet.cabecalho.data_criacao);
+        const dataFormatada = data.toISOString().slice(0, 10); // 'YYYY-MM-DD'
+        document.getElementById('data_criacao').value = dataFormatada;
+    } else {
+        document.getElementById('data_criacao').value = '';
+    }
 }
 
 function fillItemForm(item) {
@@ -463,6 +472,7 @@ function getPalletFormData() {
             local_de_estoque: parseInt(document.getElementById('local-estoque').value),
             tex_localEstoque: document.getElementById('local-estoque').options[document.getElementById('local-estoque').selectedIndex].text,
             processo_interno: document.getElementById('processo-interno').value,
+            data_criacao: document.getElementById('data_criacao').value,
             tex_processo_interno: document.getElementById('processo-interno').options[document.getElementById('processo-interno').selectedIndex].text,
             q_pallets: document.getElementById('q_pallets').value
         },
@@ -495,6 +505,12 @@ async function openPalletModal(palletId = null) {
     
     // Reset form
     document.getElementById('pallet-form').reset();
+    $('#tipo-caixa').val('').trigger('change');
+    $('#produto').val('').trigger('change');
+    $('#cliente').val('').trigger('change');
+    $('#tipo-etiqueta').val('').trigger('change');
+    $('#local-estoque').val('').trigger('change');
+    $('#processo-interno').val('').trigger('change');
     
     // Reset tabs
     document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));

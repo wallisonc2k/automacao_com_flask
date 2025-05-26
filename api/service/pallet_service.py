@@ -131,6 +131,10 @@ def atualizar_pallet(pallet_bd, pallet_novo, itens_novos=None):
     pallet_bd.tex_processo_interno = pallet_novo.tex_processo_interno
     pallet_bd.q_pallets = pallet_novo.q_pallets
 
+    # ✅ Atualizar data_criacao (se fornecida)
+    if pallet_novo.data_criacao:
+        pallet_bd.data_criacao = pallet_novo.data_criacao
+
     
     # Se novos itens foram fornecidos, atualizar também
     if itens_novos is not None:

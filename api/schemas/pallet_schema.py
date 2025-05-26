@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import List, Optional
+from datetime import datetime
 
 class CabecalhoPallet(BaseModel):
     tipo_de_caixa: int
@@ -21,6 +22,7 @@ class CabecalhoPallet(BaseModel):
     tex_processo_interno: str
     
     q_pallets: Optional[int] = 1
+    data_criacao: Optional[datetime] = None
 
 
 

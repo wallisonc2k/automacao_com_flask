@@ -40,6 +40,15 @@ class GvsSystem:
         self.fechar_driver()
     
 
+    def __enter__(self):
+        self.iniciar_driver()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.fechar_driver()
+
+    
+
     def iniciar_driver(self):
         if not self.driver:
             options = webdriver.ChromeOptions()
@@ -182,14 +191,14 @@ class RegistroPalletManager(GvsSystem):
 
         if imprimir_etiqueta:
             self.imprimir_etiqueta(pallet_id)
+        self.driver.reflesh()
 
-    def imprimir_etiqueta(self, pallet_id):
+    def imprimir_etiqueta(self, pallet_id, qtd=2):
         self.driver.get(f"{self.url_base}/admin/registroPallet/printOut/{pallet_id}/1")
-        sleep(10)
-        self.driver.execute_script("window.print();")
         sleep(5)
-        self.driver.execute_script("window.print();")
-        sleep(5)
+        for q in range(qtd):
+            self.driver.execute_script("window.print();")
+            sleep(5)
 
     def realizar_lancamento_pallets(self, dados: List[dict], imprimir_etiqueta=True):
         for data in dados:
