@@ -44,7 +44,8 @@ def criar_pallet():
             processo_interno=registro_pallet.cabecalho.processo_interno,
             tex_processo_interno=registro_pallet.cabecalho.tex_processo_interno,
             data_criacao=registro_pallet.cabecalho.data_criacao,
-            q_pallets=registro_pallet.cabecalho.q_pallets
+            q_pallets=registro_pallet.cabecalho.q_pallets,
+            reprocesso=registro_pallet.cabecalho.reprocesso
         )
         
         itens = []
@@ -80,7 +81,8 @@ def criar_pallet():
             "processo_interno": resultado.processo_interno,
             "tex_processo_interno": resultado.tex_processo_interno,
             "q_pallets": resultado.q_pallets,
-            "data_criacao": resultado.data_criacao.isoformat() if resultado.data_criacao else None
+            "data_criacao": resultado.data_criacao.isoformat() if resultado.data_criacao else None,
+            "reprocesso": resultado.reprocesso
         }
         
         # Retornar resposta
@@ -157,7 +159,8 @@ def obter_pallets():
                     "tex_localEstoque": p.tex_localEstoque,
                     "processo_interno": p.processo_interno,
                     "tex_processo_interno": p.tex_processo_interno,
-                    "q_pallets": p.q_pallets
+                    "q_pallets": p.q_pallets,
+                    "reprocesso": p.reprocesso
                 },
                 "itens": itens_list,
                 "data_criacao": p.data_criacao.isoformat() if p.data_criacao else None
@@ -205,7 +208,8 @@ def obter_pallet(id):
             "processo_interno": pallet.processo_interno,
             "tex_processo_interno": pallet.tex_processo_interno,
             "data_criacao": pallet.data_criacao.isoformat() if pallet.data_criacao else None,
-            "q_pallets": pallet.q_pallets
+            "q_pallets": pallet.q_pallets,
+            "reprocesso":pallet.reprocesso
         }
         
         # Converter itens para dicionários
@@ -279,7 +283,8 @@ def atualizar_pallet_route(id):
             processo_interno=registro_pallet.cabecalho.processo_interno,
             tex_processo_interno=registro_pallet.cabecalho.tex_processo_interno,
             data_criacao=registro_pallet.cabecalho.data_criacao,
-            q_pallets=registro_pallet.cabecalho.q_pallets
+            q_pallets=registro_pallet.cabecalho.q_pallets,
+            reprocesso =registro_pallet.cabecalho.reprocesso
         )
         
         itens_novos = []
@@ -318,7 +323,8 @@ def atualizar_pallet_route(id):
             "processo_interno": resultado.processo_interno,
             "tex_processo_interno": resultado.tex_processo_interno,
             "data_criacao": resultado.data_criacao.isoformat() if resultado.data_criacao else None,
-            "q_pallets": resultado.q_pallets
+            "q_pallets": resultado.q_pallets,
+            "reprocesso":resultado.reprocesso
         }
         
         # Converter itens para dicionários

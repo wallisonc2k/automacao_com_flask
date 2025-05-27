@@ -29,6 +29,8 @@ class CabecalhoPalletModel(db.Model):
 
     data_criacao = db.Column(db.DateTime, nullable=False, default=func.now())
 
+    reprocesso = db.Column(db.Boolean, nullable=False, default=False)
+
     # Relacionamento com itens do pallet
     itens = db.relationship('ItemPalletModel', backref='cabecalho', lazy=True, cascade="all, delete-orphan")
 

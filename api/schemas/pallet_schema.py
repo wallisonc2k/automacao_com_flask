@@ -24,6 +24,7 @@ class CabecalhoPallet(BaseModel):
     q_pallets: Optional[int] = 1
     data_criacao: Optional[datetime] = None
 
+    reprocesso: Optional[bool] = False
 
 
 class ItemPallet(BaseModel):

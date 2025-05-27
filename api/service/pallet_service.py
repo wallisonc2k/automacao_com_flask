@@ -30,7 +30,8 @@ def cadastrar_pallet(cabecalho, itens):
         processo_interno=cabecalho.processo_interno,
         tex_processo_interno=cabecalho.tex_processo_interno,
         q_pallets=cabecalho.q_pallets,
-        data_criacao=datetime.now()
+        data_criacao=datetime.now(),
+        reprocesso=cabecalho.reprocesso
     )
     
     db.session.add(cabecalho_bd)
@@ -130,6 +131,7 @@ def atualizar_pallet(pallet_bd, pallet_novo, itens_novos=None):
     pallet_bd.processo_interno = pallet_novo.processo_interno
     pallet_bd.tex_processo_interno = pallet_novo.tex_processo_interno
     pallet_bd.q_pallets = pallet_novo.q_pallets
+    pallet_bd.reprocesso = pallet_novo.reprocesso
 
     # ✅ Atualizar data_criacao (se fornecida)
     if pallet_novo.data_criacao:

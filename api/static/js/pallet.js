@@ -436,6 +436,7 @@ function fillPalletForm(pallet) {
     $('#local-estoque').val(pallet.cabecalho.local_de_estoque || '').trigger('change');
     $('#processo-interno').val(pallet.cabecalho.processo_interno || '').trigger('change');
     document.getElementById('q_pallets').value = pallet.cabecalho.q_pallets || '';
+    document.getElementById('reprocesso').checked = pallet.cabecalho.reprocesso || '';
     
     // Preencher o campo data_criacao
     if (pallet.cabecalho.data_criacao) {
@@ -476,7 +477,8 @@ function getPalletFormData() {
             processo_interno: document.getElementById('processo-interno').value,
             data_criacao: dataCriacaoTratada,
             tex_processo_interno: document.getElementById('processo-interno').options[document.getElementById('processo-interno').selectedIndex].text,
-            q_pallets: document.getElementById('q_pallets').value
+            q_pallets: document.getElementById('q_pallets').value,
+            reprocesso: document.getElementById('reprocesso').checked
         },
         itens: currentPallet ? [...currentPallet.itens] : []
     };

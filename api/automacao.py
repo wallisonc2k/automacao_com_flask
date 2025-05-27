@@ -222,7 +222,20 @@ class RegistroPalletManager(GvsSystem):
 
         self.driver.get(self.url_registro_pallets)
         self.driver.find_element(By.XPATH, '//*[@id="mainHeaderRigth"]/div/button/i').click()
+        
+        # sleep(3)
+        # data = self.driver.find_element(By.XPATH , '//*[@id="registroPalletOpenDate"]')
+        # data.click()
+        # ActionChains(driver).key_down(Keys.CONTROL).send_keys('a').key_up(Keys.CONTROL).perform()
+        # data.send_keys(cab.data_criacao.strftime("%d/%m/%Y"))
+        sleep(3)
+        data = self.driver.find_element(By.ID, 'registroPalletOpenDate')
+        data.clear()
+        data.send_keys(cab.data_criacao.strftime("%d/%m/%Y"))
 
+        if cab.reprocesso:
+            self.driver.find_element(By.XPATH , '//*[@id="registroPalletReprocesso"]').click()
+        
         self.selecionar_opcao_por_index(self.driver.find_element(By.NAME, 'categoria_id'), 4)
         #sleep(3)
         self.selecionar_opcao_por_value(self.driver.find_element(By.NAME, 'embalagem_id'), cab.tipo_de_caixa)
