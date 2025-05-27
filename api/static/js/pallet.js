@@ -459,6 +459,8 @@ function fillItemForm(item) {
 }
 
 function getPalletFormData() {
+    const dataCriacao = document.getElementById('data_criacao').value;
+    const dataCriacaoTratada = dataCriacao === "" ? null : dataCriacao;
     return {
         cabecalho: {
             tipo_de_caixa: parseInt(document.getElementById('tipo-caixa').value),
@@ -472,7 +474,7 @@ function getPalletFormData() {
             local_de_estoque: parseInt(document.getElementById('local-estoque').value),
             tex_localEstoque: document.getElementById('local-estoque').options[document.getElementById('local-estoque').selectedIndex].text,
             processo_interno: document.getElementById('processo-interno').value,
-            data_criacao: document.getElementById('data_criacao').value,
+            data_criacao: dataCriacaoTratada,
             tex_processo_interno: document.getElementById('processo-interno').options[document.getElementById('processo-interno').selectedIndex].text,
             q_pallets: document.getElementById('q_pallets').value
         },
