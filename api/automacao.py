@@ -191,7 +191,7 @@ class RegistroPalletManager(GvsSystem):
 
         if imprimir_etiqueta:
             self.imprimir_etiqueta(pallet_id)
-        self.driver.reflesh()
+        self.driver.refresh()
 
     def imprimir_etiqueta(self, pallet_id, qtd=2):
         self.driver.get(f"{self.url_base}/admin/registroPallet/printOut/{pallet_id}/1")
